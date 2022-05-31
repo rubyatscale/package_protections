@@ -9,6 +9,7 @@ require 'package_protections/private/outgoing_dependency_protection'
 require 'package_protections/private/metadata_modifiers'
 require 'package_protections/private/multiple_namespaces_protection'
 require 'package_protections/private/visibility_protection'
+require 'package_protections/private/configuration'
 
 module PackageProtections
   #
@@ -17,6 +18,12 @@ module PackageProtections
   #
   module Private
     extend T::Sig
+
+    sig { returns(Private::Configuration) }
+    def self.config
+      @config = T.let(@config, T.nilable(Configuration))
+      @config ||= Private::Configuration.new
+    end
 
     sig do
       params(
@@ -138,6 +145,7 @@ module PackageProtections
     def self.bust_cache!
       @protected_packages_indexed_by_name = nil
       @private_cop_config = nil
+      config.bust_cache!
     end
 
     sig { params(identifier: Identifier).returns(T::Hash[T.untyped, T.untyped]) }

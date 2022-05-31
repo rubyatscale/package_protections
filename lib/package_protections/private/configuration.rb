@@ -7,7 +7,7 @@ module PackageProtections
 
       sig { params(protections: T::Array[ProtectionInterface]).void }
       attr_writer :protections
- 
+
       sig { void }
       def initialize
         @protections = T.let(@protections, T.nilable(T::Array[ProtectionInterface]))

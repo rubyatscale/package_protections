@@ -38,12 +38,11 @@ module PackageProtections
   # Implementation of rubocop-based protections
   require 'rubocop/cop/package_protections/namespaced_under_package_name'
 
-
   class << self
     extend T::Sig
 
     sig { params(blk: T.proc.params(arg0: Private::Configuration).void).void }
-    def configure(&blk) # rubocop:disable Lint/UnusedMethodArgument
+    def configure(&blk)
       yield(Private.config)
     end
   end

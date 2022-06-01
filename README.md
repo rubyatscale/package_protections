@@ -128,6 +128,18 @@ PackageProtections.set_defaults!(packages)
 PackageProtections.set_defaults!(packages.select{|p| p.package_name == 'packs/my_package'})
 ```
 
+## Custom Protections
+
+It's possible to create your own custom protections that go through this interface. To do this, you just need to implement a protection and configure `PackageProtections`.
+
+```ruby
+PackageProtections.configure do |config|
+  config.protections += [MyCustomProtection]
+end
+```
+
+In this example, `MyCustomProtection` needs to implement the `PackageProtections::ProtectionInterface` (for protections powered by `packwerk` that look at new and existing violations) OR `PackageProtections::RubocopProtectionInterface` (for protections powered by `rubocop` that look at the AST). It's recommended to take a look at the existing protections as examples. If you're having any trouble with this, please file an issue and we'll be glad to help.
+
 ## Incorporating into your CI Pipeline
 Your CI pipeline can execute the public API ta and fail if there are any offenses.
 

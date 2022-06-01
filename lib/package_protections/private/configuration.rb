@@ -10,23 +10,28 @@ module PackageProtections
 
       sig { void }
       def initialize
-        @protections = T.let(@protections, T.nilable(T::Array[ProtectionInterface]))
+        @protections = T.let(default_protections, T::Array[ProtectionInterface])
       end
 
       sig { returns(T::Array[ProtectionInterface]) }
       def protections
-        @protections ||= [
+        @protections
+      end
+
+      sig { void }
+      def bust_cache!
+        @protections = default_protections
+      end
+
+      sig { returns(T::Array[ProtectionInterface]) }
+      def default_protections
+        [
           Private::OutgoingDependencyProtection.new,
           Private::IncomingPrivacyProtection.new,
           Private::TypedApiProtection.new,
           Private::MultipleNamespacesProtection.new,
           Private::VisibilityProtection.new
         ]
-      end
-
-      sig { void }
-      def bust_cache!
-        @protections = nil
       end
     end
   end

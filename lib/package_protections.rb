@@ -38,20 +38,18 @@ module PackageProtections
   # Implementation of rubocop-based protections
   require 'rubocop/cop/package_protections/namespaced_under_package_name'
 
-  #
-  # These are all of the concrete implementations of the `ProtectionInterface`.
-  # This list is added to when a new protection is created, but in the future,
-  # this list may be injected by the client.
-  #
+  class << self
+    extend T::Sig
+
+    sig { params(blk: T.proc.params(arg0: Private::Configuration).void).void }
+    def configure(&blk)
+      yield(Private.config)
+    end
+  end
+
   sig { returns(T::Array[ProtectionInterface]) }
   def self.all
-    [
-      Private::OutgoingDependencyProtection.new,
-      Private::IncomingPrivacyProtection.new,
-      Private::TypedApiProtection.new,
-      Private::MultipleNamespacesProtection.new,
-      Private::VisibilityProtection.new
-    ]
+    Private.config.protections
   end
 
   #

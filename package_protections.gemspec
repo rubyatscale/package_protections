@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = 'package_protections'
-  spec.version       = '0.65.0'
+  spec.version       = '0.66.0'
   spec.authors       = ['Gusto Engineers']
   spec.email         = ['stephan.hagemann@gusto.com']
   spec.summary       = 'Package protections for Rails apps'

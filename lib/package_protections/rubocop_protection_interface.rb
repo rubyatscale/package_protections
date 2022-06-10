@@ -32,16 +32,7 @@ module PackageProtections
 
       sig { returns(String) }
       def to_rubocop_yml_compatible_format
-        cop_config = {
-          'Enabled' => enabled,
-          # Inherit mode ensures that the client can still use the cop outside of the context of package protections.
-          # For example, if a user wanted to use `Sorbet/StrictSigil` to keep *all* of their package strictly typed,
-          # this would permit that configuration. Likewise, this would permit a user to override portions of rubocop-implemented
-          # package protections. For example, they could have a hard-to-type portion of their public API (GraphQL maybe?).
-          # This would permit them to tell rubocop to selectively not enforce package protections in a particular place.
-          # See more: https://docs.rubocop.org/rubocop/configuration.html#merging-arrays-using-inherit_mode
-          'inherit_mode' => { 'merge' => %w[Include Exclude] }
-        }
+        cop_config = { 'Enabled' => enabled }
 
         if include_paths.any?
           cop_config['Include'] = include_paths

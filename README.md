@@ -141,7 +141,7 @@ end
 In this example, `MyCustomProtection` needs to implement the `PackageProtections::ProtectionInterface` (for protections powered by `packwerk` that look at new and existing violations) OR `PackageProtections::RubocopProtectionInterface` (for protections powered by `rubocop` that look at the AST). It's recommended to take a look at the existing protections as examples. If you're having any trouble with this, please file an issue and we'll be glad to help.
 
 ## Incorporating into your CI Pipeline
-Your CI pipeline can execute the public API ta and fail if there are any offenses.
+Your CI pipeline can execute the public API and fail if there are any offenses.
 
 ## Discussions, Issues, Questions, and More
 To keep things organized, here are some recommended homes:

@@ -17,14 +17,14 @@ module PackageProtections
       invalid_identifiers = metadata.keys - valid_identifiers
 
       if invalid_identifiers.any?
-        raise IncorrectPublicApiUsageError.new("Invalid configuration for package `#{original_package.name}`. The metadata keys #{invalid_identifiers.inspect} are not valid behaviors under the `protection` metadata namespace. Valid keys are #{valid_identifiers.inspect}. See https://github.com/bigrails/package_protections#readme for more info") # rubocop:disable Style/RaiseArgs
+        raise IncorrectPublicApiUsageError.new("Invalid configuration for package `#{original_package.name}`. The metadata keys #{invalid_identifiers.inspect} are not valid behaviors under the `protection` metadata namespace. Valid keys are #{valid_identifiers.inspect}. See https://github.com/rubyatscale/package_protections#readme for more info") # rubocop:disable Style/RaiseArgs
       end
 
       protections = {}
       metadata.each_key do |protection_key|
         protection = PackageProtections.with_identifier(protection_key)
         if !protection
-          raise IncorrectPublicApiUsageError.new("Invalid configuration for package `#{original_package.name}`. The metadata key #{protection_key} is not a valid behaviors under the `protection` metadata namespace. Valid keys are #{valid_identifiers.inspect}. See https://github.com/bigrails/package_protections#readme for more info") # rubocop:disable Style/RaiseArgs
+          raise IncorrectPublicApiUsageError.new("Invalid configuration for package `#{original_package.name}`. The metadata key #{protection_key} is not a valid behaviors under the `protection` metadata namespace. Valid keys are #{valid_identifiers.inspect}. See https://github.com/rubyatscale/package_protections#readme for more info") # rubocop:disable Style/RaiseArgs
         end
 
         protections[protection.identifier] = get_violation_behavior(protection, metadata, original_package)
@@ -57,7 +57,7 @@ module PackageProtections
       behavior = ViolationBehavior.from_raw_value(metadata[protection.identifier])
       unmet_preconditions = protection.unmet_preconditions_for_behavior(behavior, package)
       if !unmet_preconditions.nil?
-        raise IncorrectPublicApiUsageError.new("#{protection.identifier} protection does not have the valid preconditions. #{unmet_preconditions}. See https://github.com/bigrails/package_protections#readme for more info") # rubocop:disable Style/RaiseArgs
+        raise IncorrectPublicApiUsageError.new("#{protection.identifier} protection does not have the valid preconditions. #{unmet_preconditions}. See https://github.com/rubyatscale/package_protections#readme for more info") # rubocop:disable Style/RaiseArgs
       end
 
       behavior

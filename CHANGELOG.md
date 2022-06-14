@@ -1,1 +1,1 @@
-See https://github.com/bigrails/package_protections/releases
+See https://github.com/rubyatscale/package_protections/releases

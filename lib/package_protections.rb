@@ -10,7 +10,7 @@ require 'rubocop-sorbet'
 
 #
 # Welcome to PackageProtections!
-# See https://github.com/bigrails/package_protections#readme for more info
+# See https://github.com/rubyatscale/package_protections#readme for more info
 #
 # This file is a reference for the available API to `package_protections`, but all implementation details are private
 # (which is why we delegate to `Private` for the actual implementation).

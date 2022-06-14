@@ -8,7 +8,7 @@ The intent of this gem is two fold:
 This gem ships with the following checks
 1) Your package is not introducing dependencies that are not intended (via `packwerk` `enforce_dependencies`)
 2) Other packages are not using the private API of your package (via `packwerk` `enforce_privacy`)
-3) Your package has a typed public API (via the `rubocop` `Sorbet/StrictSigil` cop)
+3) Your package has a typed public API (via the `rubocop` `PackageProtections/TypedPublicApi` cop)
 4) Your package only creates a single namespace (via the `rubocop` `PackageProtections/NamespacedUnderPackageName` cop)
 4) Your package is only visible to a select number of packages (via the `packwerk` `enforce_privacy` cop)
 

@@ -10,7 +10,7 @@ module PackageProtections
       include RubocopProtectionInterface
 
       IDENTIFIER = 'prevent_this_package_from_exposing_an_untyped_api'
-      COP_NAME = 'Sorbet/StrictSigil'
+      COP_NAME = 'PackageProtections/TypedPublicApi'
 
       sig { override.returns(String) }
       def identifier

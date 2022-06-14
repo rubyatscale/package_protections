@@ -579,7 +579,7 @@ describe PackageProtections do
         it 'has a helpful humanized description' do
           expected_humanized_message = <<~MESSAGE
             These files cannot have ANY Ruby files in the public API that are not typed strict or higher.
-            This is failing because these files are in `.rubocop_todo.yml` under `Sorbet/StrictSigil`.
+            This is failing because these files are in `.rubocop_todo.yml` under `PackageProtections/TypedPublicApi`.
             If you want to be able to ignore these files, you'll need to open the file's package's `package.yml` file and
             change `prevent_this_package_from_exposing_an_untyped_api` to `fail_on_new`
 
@@ -597,7 +597,7 @@ describe PackageProtections do
 
           it 'generates the expected rubocop.yml entries' do
             apples_package_yml_with_typed_api_protection_set_to_fail_never
-            cop_config = get_resulting_rubocop['Sorbet/StrictSigil']
+            cop_config = get_resulting_rubocop['PackageProtections/TypedPublicApi']
             expect(cop_config).to eq({ 'Enabled' => false })
           end
 
@@ -613,7 +613,7 @@ describe PackageProtections do
 
             write_file('packs/apples/app/public/tool.rb', '')
             write_file('.rubocop_todo.yml', <<~YML.strip)
-              Sorbet/StrictSigil:
+              PackageProtections/TypedPublicApi:
                 Exclude:
                   - packs/apples/app/public/tool.rb
             YML
@@ -630,7 +630,7 @@ describe PackageProtections do
 
           it 'generates the expected rubocop.yml entries' do
             apples_package_yml_with_typed_api_protection_set_to_fail_on_new
-            cop_config = get_resulting_rubocop['Sorbet/StrictSigil']
+            cop_config = get_resulting_rubocop['PackageProtections/TypedPublicApi']
             expect(cop_config['Exclude']).to eq(nil)
             expect(cop_config['Include']).to eq(['packs/apples/app/public/**/*'])
             expect(cop_config['Enabled']).to eq(true)
@@ -651,7 +651,7 @@ describe PackageProtections do
 
           it 'generates the expected rubocop.yml entries' do
             apples_package_yml_with_typed_api_protection_set_to_fail_on_any
-            cop_config = get_resulting_rubocop['Sorbet/StrictSigil']
+            cop_config = get_resulting_rubocop['PackageProtections/TypedPublicApi']
             expect(cop_config['Exclude']).to eq(nil)
             expect(cop_config['Include']).to eq(['packs/apples/app/public/**/*'])
             expect(cop_config['Enabled']).to eq(true)
@@ -669,7 +669,7 @@ describe PackageProtections do
             apples_package_yml_with_typed_api_protection_set_to_fail_on_any
             write_file('packs/apples/app/services/tool.rb', '')
             write_file('.rubocop_todo.yml', <<~YML.strip)
-              Sorbet/StrictSigil:
+              PackageProtections/TypedPublicApi:
                 Exclude:
                   - packs/apples/app/services/tool.rb
             YML
@@ -683,7 +683,7 @@ describe PackageProtections do
 
             write_file('packs/apples/app/public/tool.rb', '')
             write_file('.rubocop_todo.yml', <<~YML.strip)
-              Sorbet/StrictSigil:
+              PackageProtections/TypedPublicApi:
                 Exclude:
                   - packs/apples/app/public/tool.rb
             YML
@@ -701,7 +701,7 @@ describe PackageProtections do
 
             write_file('packs/apples/app/public/tool.rb', '')
             write_file('.rubocop_todo.yml', <<~YML.strip)
-              Sorbet/StrictSigil:
+              PackageProtections/TypedPublicApi:
                 Exclude:
                   - packs/other_pack/app/public/tool.rb
             YML

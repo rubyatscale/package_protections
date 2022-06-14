@@ -192,7 +192,7 @@ describe PackageProtections do
         write_package_yml('packs/trees')
 
         expect { PackageProtections.get_offenses(packages: get_packages, new_violations: []) }.to raise_error(PackageProtections::IncorrectPublicApiUsageError) do |e|
-          expect(e.message).to eq 'Invalid configuration for package `packs/trees`. The metadata keys ["prevent_this_package_from_violating_its_stated_dependencies", "prevent_other_packages_from_using_this_packages_internals", "prevent_this_package_from_exposing_an_untyped_api", "prevent_this_package_from_creating_other_namespaces", "prevent_other_packages_from_using_this_package_without_explicit_visibility"] are not valid behaviors under the `protection` metadata namespace. Valid keys are []. See https://github.com/bigrails/package_protections#readme for more info'
+          expect(e.message).to eq 'Invalid configuration for package `packs/trees`. The metadata keys ["prevent_this_package_from_violating_its_stated_dependencies", "prevent_other_packages_from_using_this_packages_internals", "prevent_this_package_from_exposing_an_untyped_api", "prevent_this_package_from_creating_other_namespaces", "prevent_other_packages_from_using_this_package_without_explicit_visibility"] are not valid behaviors under the `protection` metadata namespace. Valid keys are []. See https://github.com/rubyatscale/package_protections#readme for more info'
         end
       end
     end

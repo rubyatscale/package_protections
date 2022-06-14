@@ -146,16 +146,16 @@ Your CI pipeline can execute the public API ta and fail if there are any offense
 ## Discussions, Issues, Questions, and More
 To keep things organized, here are some recommended homes:
 ### Issues:
-https://github.com/bigrails/package_protections/issues
+https://github.com/rubyatscale/package_protections/issues
 
 ### Questions:
-https://github.com/bigrails/package_protections/discussions/categories/q-a
+https://github.com/rubyatscale/package_protections/discussions/categories/q-a
 
 ### General discussions:
-https://github.com/bigrails/package_protections/discussions/categories/general
+https://github.com/rubyatscale/package_protections/discussions/categories/general
 
 ### Ideas, new features, requests for change:
-https://github.com/bigrails/package_protections/discussions/categories/ideas
+https://github.com/rubyatscale/package_protections/discussions/categories/ideas
 
 ### Showcasing your work:
-https://github.com/bigrails/package_protections/discussions/categories/show-and-tell
+https://github.com/rubyatscale/package_protections/discussions/categories/show-and-tell

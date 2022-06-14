@@ -19,7 +19,7 @@ module PackageProtections
     rescue KeyError
       # Let's not encourage "unknown." That's mostly considered an internal value if nothing is specified.
       acceptable_values = ViolationBehavior.values.map(&:serialize) - ['unknown']
-      raise IncorrectPublicApiUsageError.new("The metadata value #{value} is not a valid behavior. Double check your spelling! Acceptable values are #{acceptable_values}. See https://github.com/bigrails/package_protections#readme for more info") # rubocop:disable Style/RaiseArgs
+      raise IncorrectPublicApiUsageError.new("The metadata value #{value} is not a valid behavior. Double check your spelling! Acceptable values are #{acceptable_values}. See https://github.com/rubyatscale/package_protections#readme for more info") # rubocop:disable Style/RaiseArgs
     end
 
     sig { returns(T::Boolean) }

@@ -29,7 +29,7 @@ module PackageProtections
           Private::OutgoingDependencyProtection.new,
           Private::IncomingPrivacyProtection.new,
           Private::TypedApiProtection.new,
-          Private::MultipleNamespacesProtection.new,
+          RuboCop::Cop::PackageProtections::NamespacedUnderPackageName.new,
           Private::VisibilityProtection.new
         ]
       end

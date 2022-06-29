@@ -1,4 +1,4 @@
-# typed: false
+# typed: true
 
 # For String#camelize
 require 'active_support/core_ext/string/inflections'
@@ -39,7 +39,7 @@ module RuboCop
           #
           # Therefore, for our implementation, we substitute out the non-namespace producing portions of the filename to count the number of namespaces.
           # Note this will *not work* properly in applications that have different assumptions about autoloading.
-          package_last_name = package_name.split('/').last
+          package_last_name = T.must(package_name.split('/').last)
           path_without_package_base = relative_filename.gsub(%r{#{package_name}/app/}, '')
           if path_without_package_base.include?('concerns')
             autoload_folder_name = path_without_package_base.split('/').first(2).join('/')

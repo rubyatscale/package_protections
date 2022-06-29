@@ -2,7 +2,6 @@
 #   srb rbi todo
 
 # typed: strong
-module ::RuboCop::Cop::PackageProtections::NamespacedUnderPackageName; end
 module ::RuboCop::RSpec::ExpectOffense; end
 module RSpec::Matchers; end
 

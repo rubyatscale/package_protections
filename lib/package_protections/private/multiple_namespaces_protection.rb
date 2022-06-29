@@ -108,6 +108,11 @@ module PackageProtections
       end
 
       sig { override.returns(String) }
+      def cop_name
+        COP_NAME
+      end
+
+      sig { override.returns(String) }
       def humanized_protection_name
         'Multiple Namespaces Violations'
       end

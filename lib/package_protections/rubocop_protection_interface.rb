@@ -77,6 +77,10 @@ module PackageProtections
       end
     end
 
+    sig { abstract.returns(String) }
+    def cop_name
+    end
+
     private
 
     sig { params(rule: String).returns(T::Set[String]) }

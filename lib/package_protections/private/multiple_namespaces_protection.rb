@@ -43,8 +43,6 @@ module PackageProtections
       def cop_configs(packages)
         include_paths = T.let([], T::Array[String])
         packages.each do |p|
-          next if p.name == ParsePackwerk::ROOT_PACKAGE_NAME
-
           if p.violation_behavior_for(identifier).enabled?
             include_paths << p.original_package.directory.join('app', '**', '*').to_s
             include_paths << p.original_package.directory.join('lib', '**', '*').to_s

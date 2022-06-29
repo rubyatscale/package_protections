@@ -3,7 +3,6 @@
 
 require 'package_protections/private/colorized_string'
 require 'package_protections/private/output'
-require 'package_protections/private/typed_api_protection'
 require 'package_protections/private/incoming_privacy_protection'
 require 'package_protections/private/outgoing_dependency_protection'
 require 'package_protections/private/metadata_modifiers'

@@ -10,13 +10,6 @@ module PackageProtections
     abstract!
 
     sig do
-      abstract
-        .params(packages: T::Array[ProtectedPackage])
-        .returns(T::Array[CopConfig])
-    end
-    def cop_configs(packages); end
-
-    sig do
       params(package: ProtectedPackage).returns(T::Hash[T.untyped, T.untyped])
     end
     def custom_cop_config(package)
@@ -122,6 +115,33 @@ module PackageProtections
       abstract.params(file: String).returns(String)
     end
     def message_for_fail_on_any(file)
+    end
+
+    sig { abstract.returns(T::Array[String]) }
+    def included_globs_for_pack
+    end
+
+    sig do
+      params(packages: T::Array[ProtectedPackage]).
+      returns(T::Array[CopConfig])
+    end
+    def cop_configs(packages)
+      include_paths = T.let([], T::Array[String])
+      packages.each do |p|
+        if p.violation_behavior_for(identifier).enabled?
+          included_globs_for_pack.each do |glob|
+            include_paths << p.original_package.directory.join(glob).to_s
+          end
+        end
+      end
+
+      [
+        CopConfig.new(
+          name: cop_name,
+          enabled: include_paths.any?,
+          include_paths: include_paths
+        )
+      ]
     end
 
     private

@@ -35,26 +35,11 @@ module PackageProtections
         end
       end
 
-      sig do
-        override
-          .params(packages: T::Array[ProtectedPackage])
-          .returns(T::Array[CopConfig])
-      end
-      def cop_configs(packages)
-        include_paths = T.let([], T::Array[String])
-        packages.each do |p|
-          if p.violation_behavior_for(identifier).enabled?
-            include_paths << p.original_package.directory.join('app', '**', '*').to_s
-            include_paths << p.original_package.directory.join('lib', '**', '*').to_s
-          end
-        end
-
+      sig { override.returns(T::Array[String]) }
+      def included_globs_for_pack
         [
-          CopConfig.new(
-            name: cop_name,
-            enabled: include_paths.any?,
-            include_paths: include_paths
-          )
+          'app/**/*',
+          'lib/**/*',
         ]
       end
 

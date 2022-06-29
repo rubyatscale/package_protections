@@ -24,38 +24,17 @@ module PackageProtections
         nil
       end
 
-      sig do
-        override
-          .params(packages: T::Array[ProtectedPackage])
-          .returns(T::Array[CopConfig])
-      end
-      def cop_configs(packages)
-        include_paths = T.let([], T::Array[String])
-        packages.each do |p|
-          if p.violation_behavior_for(identifier).enabled?
-            directory = p.original_package.directory
-            include_paths << directory.join('app', 'public', '**', '*').to_s
-          end
-        end
-
-        [
-          CopConfig.new(
-            name: cop_name,
-            enabled: include_paths.any?,
-            include_paths: include_paths
-          )
-        ]
-      end
-
       sig { override.returns(String) }
       def cop_name
         'PackageProtections/TypedPublicApi'
       end
 
-
-      # sig { abstract.returns(T::Array[String]) }
-      # def included_pack_globs
-      # end
+      sig { override.returns(T::Array[String]) }
+      def included_globs_for_pack
+        [
+          'app/public/**/*',
+        ]
+      end
 
       sig do
         override.params(file: String).returns(String)

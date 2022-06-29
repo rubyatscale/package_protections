@@ -11,7 +11,6 @@ module PackageProtections
       include RubocopProtectionInterface
 
       IDENTIFIER = 'prevent_this_package_from_creating_other_namespaces'
-      COP_NAME = 'PackageProtections/NamespacedUnderPackageName'
 
       sig { override.returns(String) }
       def identifier
@@ -54,7 +53,7 @@ module PackageProtections
 
         [
           CopConfig.new(
-            name: COP_NAME,
+            name: cop_name,
             enabled: include_paths.any?,
             include_paths: include_paths
           )
@@ -72,7 +71,7 @@ module PackageProtections
 
       sig { override.returns(String) }
       def cop_name
-        COP_NAME
+        'PackageProtections/NamespacedUnderPackageName'
       end
 
       sig { override.returns(String) }
@@ -84,7 +83,7 @@ module PackageProtections
       def humanized_protection_description
         <<~MESSAGE
           These files cannot have ANY modules/classes that are not submodules of the package's allowed namespaces.
-          This is failing because these files are in `.rubocop_todo.yml` under `#{COP_NAME}`.
+          This is failing because these files are in `.rubocop_todo.yml` under `#{cop_name}`.
           If you want to be able to ignore these files, you'll need to open the file's package's `package.yml` file and
           change `#{IDENTIFIER}` to `#{ViolationBehavior::FailOnNew.serialize}`
 

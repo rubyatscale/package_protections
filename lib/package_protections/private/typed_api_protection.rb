@@ -10,7 +10,6 @@ module PackageProtections
       include RubocopProtectionInterface
 
       IDENTIFIER = 'prevent_this_package_from_exposing_an_untyped_api'
-      COP_NAME = 'PackageProtections/TypedPublicApi'
 
       sig { override.returns(String) }
       def identifier
@@ -41,7 +40,7 @@ module PackageProtections
 
         [
           CopConfig.new(
-            name: COP_NAME,
+            name: cop_name,
             enabled: include_paths.any?,
             include_paths: include_paths
           )
@@ -50,7 +49,7 @@ module PackageProtections
 
       sig { override.returns(String) }
       def cop_name
-        COP_NAME
+        'PackageProtections/TypedPublicApi'
       end
 
 
@@ -68,7 +67,7 @@ module PackageProtections
       def humanized_protection_description
         <<~MESSAGE
           These files cannot have ANY Ruby files in the public API that are not typed strict or higher.
-          This is failing because these files are in `.rubocop_todo.yml` under `#{COP_NAME}`.
+          This is failing because these files are in `.rubocop_todo.yml` under `#{cop_name}`.
           If you want to be able to ignore these files, you'll need to open the file's package's `package.yml` file and
           change `#{IDENTIFIER}` to `#{ViolationBehavior::FailOnNew.serialize}`
 

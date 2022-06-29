@@ -48,47 +48,16 @@ module PackageProtections
         ]
       end
 
-      sig do
-        override.params(
-          protected_packages: T::Array[ProtectedPackage]
-        ).returns(T::Array[Offense])
-      end
-      def get_offenses_for_existing_violations(protected_packages)
-        exclude_list = exclude_for_rule(COP_NAME)
-
-        offenses = T.let([], T::Array[Offense])
-        protected_packages.flat_map do |protected_package|
-          violation_behavior = protected_package.violation_behavior_for(identifier)
-
-          case violation_behavior
-          when ViolationBehavior::FailNever, ViolationBehavior::FailOnNew
-            next
-          when ViolationBehavior::FailOnAny
-            # Continue
-          else
-            T.absurd(violation_behavior)
-          end
-
-          protected_package.original_package.directory.glob('app/public/**/**/*.*').each do |relative_path_to_file|
-            next unless exclude_list.include?(relative_path_to_file.to_s)
-
-            file = relative_path_to_file.to_s
-            offenses << Offense.new(
-              file: file,
-              message: "#{file} should be `typed: strict`",
-              violation_type: identifier,
-              package: protected_package.original_package
-            )
-          end
-        end
-
-        offenses
-      end
-
       sig { override.returns(String) }
       def cop_name
         COP_NAME
       end
+
+
+      # sig { abstract.returns(T::Array[String]) }
+      # def included_pack_globs
+      # end
+
 
       sig { override.returns(String) }
       def humanized_protection_name

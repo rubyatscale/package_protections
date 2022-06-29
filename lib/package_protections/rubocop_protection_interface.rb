@@ -81,6 +81,43 @@ module PackageProtections
     def cop_name
     end
 
+    sig do
+      override.params(
+        protected_packages: T::Array[ProtectedPackage]
+      ).returns(T::Array[Offense])
+    end
+    def get_offenses_for_existing_violations(protected_packages)
+      exclude_list = exclude_for_rule(cop_name)
+      offenses = []
+
+      protected_packages.each do |package|
+        violation_behavior = package.violation_behavior_for(identifier)
+
+        case violation_behavior
+        when ViolationBehavior::FailNever, ViolationBehavior::FailOnNew
+          next
+        when ViolationBehavior::FailOnAny
+          # Continue
+        else
+          T.absurd(violation_behavior)
+        end
+
+        package.original_package.directory.glob('**/**/*.*').each do |relative_path_to_file|
+          next unless exclude_list.include?(relative_path_to_file.to_s)
+
+          file = relative_path_to_file.to_s
+          offenses << Offense.new(
+            file: file,
+            message: "`#{file}` cannot be in exclude list as this package has set this cop to not permit any violations, including in .rubocop_todo.yml",
+            violation_type: identifier,
+            package: package.original_package
+          )
+        end
+      end
+
+      offenses
+    end
+
     private
 
     sig { params(rule: String).returns(T::Set[String]) }

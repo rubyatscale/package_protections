@@ -67,6 +67,13 @@ module PackageProtections
         }
       end
 
+      sig do
+        override.params(file: String).returns(String)
+      end
+      def message_for_fail_on_any(file)
+        "`#{file}` should be namespaced under the package namespace"
+      end
+
       sig { override.returns(String) }
       def cop_name
         'PackageProtections/NamespacedUnderPackageName'

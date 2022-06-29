@@ -680,7 +680,7 @@ describe PackageProtections do
             expect(offenses).to contain_exactly(1).offense
             expect(offenses).to include_offense offense(
               'packs/apples',
-              '`packs/apples/app/services/tool.rb` cannot be in exclude list as this package has set this cop to not permit any violations, including in .rubocop_todo.yml', 'packs/apples/app/services/tool.rb', 'prevent_this_package_from_exposing_an_untyped_api'
+              'packs/apples/app/services/tool.rb should be `typed: strict`', 'packs/apples/app/services/tool.rb', 'prevent_this_package_from_exposing_an_untyped_api'
             )
           end
 
@@ -698,7 +698,7 @@ describe PackageProtections do
             expect(offenses).to contain_exactly(1).offense
             expect(offenses).to include_offense offense(
               'packs/apples',
-              '`packs/apples/app/public/tool.rb` cannot be in exclude list as this package has set this cop to not permit any violations, including in .rubocop_todo.yml', 'packs/apples/app/public/tool.rb', 'prevent_this_package_from_exposing_an_untyped_api'
+              'packs/apples/app/public/tool.rb should be `typed: strict`', 'packs/apples/app/public/tool.rb', 'prevent_this_package_from_exposing_an_untyped_api'
             )
           end
 
@@ -850,7 +850,7 @@ describe PackageProtections do
             expect(offenses).to contain_exactly(1).offense
             expect(offenses).to include_offense offense(
               'packs/apples',
-              '`packs/apples/app/public/tool.rb` cannot be in exclude list as this package has set this cop to not permit any violations, including in .rubocop_todo.yml', 'packs/apples/app/public/tool.rb', 'prevent_this_package_from_creating_other_namespaces'
+              '`packs/apples/app/public/tool.rb` should be namespaced under the package namespace', 'packs/apples/app/public/tool.rb', 'prevent_this_package_from_creating_other_namespaces'
             )
           end
 

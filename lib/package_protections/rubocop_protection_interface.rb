@@ -108,7 +108,7 @@ module PackageProtections
           file = relative_path_to_file.to_s
           offenses << Offense.new(
             file: file,
-            message: "`#{file}` cannot be in exclude list as this package has set this cop to not permit any violations, including in .rubocop_todo.yml",
+            message: message_for_fail_on_any(file),
             violation_type: identifier,
             package: package.original_package
           )
@@ -116,6 +116,12 @@ module PackageProtections
       end
 
       offenses
+    end
+
+    sig do
+      abstract.params(file: String).returns(String)
+    end
+    def message_for_fail_on_any(file)
     end
 
     private

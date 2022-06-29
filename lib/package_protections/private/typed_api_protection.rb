@@ -57,6 +57,12 @@ module PackageProtections
       # def included_pack_globs
       # end
 
+      sig do
+        override.params(file: String).returns(String)
+      end
+      def message_for_fail_on_any(file)
+        "#{file} should be `typed: strict`"
+      end
 
       sig { override.returns(String) }
       def humanized_protection_name

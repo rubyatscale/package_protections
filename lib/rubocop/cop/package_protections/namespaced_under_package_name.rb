@@ -1,4 +1,4 @@
-# typed: ignore
+# typed: false
 
 # For String#camelize
 require 'active_support/core_ext/string/inflections'

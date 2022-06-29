@@ -23,6 +23,10 @@ module PackageProtections
       {}
     end
 
+    sig { override.params(behavior: ViolationBehavior, package: ParsePackwerk::Package).returns(T.nilable(String)) }
+    def unmet_preconditions_for_behavior(behavior, package)
+    end
+
     class CopConfig < T::Struct
       extend T::Sig
       const :name, String

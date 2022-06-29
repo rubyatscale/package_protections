@@ -3,23 +3,6 @@
 # typed: strict
 module PackageProtections
   module RubocopProtectionInterface
-    include ProtectionInterface
-    extend T::Sig
-    extend T::Helpers
-
-    abstract!
-
-    sig do
-      params(package: ProtectedPackage).returns(T::Hash[T.untyped, T.untyped])
-    end
-    def custom_cop_config(package)
-      {}
-    end
-
-    sig { override.params(behavior: ViolationBehavior, package: ParsePackwerk::Package).returns(T.nilable(String)) }
-    def unmet_preconditions_for_behavior(behavior, package)
-    end
-
     class CopConfig < T::Struct
       extend T::Sig
       const :name, String
@@ -41,6 +24,44 @@ module PackageProtections
 
         { name => cop_config }.to_yaml.gsub("---\n", '')
       end
+    end
+    
+    include ProtectionInterface
+    extend T::Sig
+    extend T::Helpers
+
+    abstract!
+
+    ###########################################################################
+    # Abstract Methods: These are methods that the client needs to implement
+    ############################################################################
+    sig { abstract.returns(String) }
+    def cop_name
+    end
+
+    sig do
+      abstract.params(file: String).returns(String)
+    end
+    def message_for_fail_on_any(file)
+    end
+
+    sig { abstract.returns(T::Array[String]) }
+    def included_globs_for_pack
+    end
+
+    ###########################################################################
+    # Overriddable Methods: These are methods that the client can override,
+    # but a default is provided.
+    ############################################################################
+    sig do
+      params(package: ProtectedPackage).returns(T::Hash[T.untyped, T.untyped])
+    end
+    def custom_cop_config(package)
+      {}
+    end
+
+    sig { override.params(behavior: ViolationBehavior, package: ParsePackwerk::Package).returns(T.nilable(String)) }
+    def unmet_preconditions_for_behavior(behavior, package)
     end
 
     sig do
@@ -68,10 +89,6 @@ module PackageProtections
           {}
         end
       end
-    end
-
-    sig { abstract.returns(String) }
-    def cop_name
     end
 
     sig do
@@ -109,16 +126,6 @@ module PackageProtections
       end
 
       offenses
-    end
-
-    sig do
-      abstract.params(file: String).returns(String)
-    end
-    def message_for_fail_on_any(file)
-    end
-
-    sig { abstract.returns(T::Array[String]) }
-    def included_globs_for_pack
     end
 
     sig do

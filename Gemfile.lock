@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    package_protections (1.1.0)
+    package_protections (1.1.1)
       activesupport
       parse_packwerk
       rubocop
@@ -67,7 +67,7 @@ GEM
       parser (>= 3.0.1.1)
     rubocop-rspec (2.8.0)
       rubocop (~> 1.19)
-    rubocop-sorbet (0.6.10)
+    rubocop-sorbet (0.6.11)
       rubocop (>= 0.90.0)
     ruby-progressbar (1.11.0)
     sorbet (0.5.9588)

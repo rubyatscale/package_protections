@@ -665,9 +665,7 @@ describe PackageProtections do
             expect(offenses).to contain_exactly(0).offenses
           end
 
-          # Note -- to simplify implementation, we look at *any* files in the exclude list.
-          # There shouldn't be much of a reason to add to this list with files that the cop doesn't look at in the first place
-          it 'fails when there are files from private implementation in the rubocop TODO list' do
+          it 'succeeds when there are files from private implementation in the rubocop TODO list' do
             apples_package_yml_with_typed_api_protection_set_to_fail_on_any
             write_file('packs/apples/app/services/tool.rb', '')
             write_file('.rubocop_todo.yml', <<~YML.strip)
@@ -677,11 +675,7 @@ describe PackageProtections do
             YML
 
             offenses = PackageProtections.get_offenses(packages: get_packages, new_violations: [])
-            expect(offenses).to contain_exactly(1).offense
-            expect(offenses).to include_offense offense(
-              'packs/apples',
-              'packs/apples/app/services/tool.rb should be `typed: strict`', 'packs/apples/app/services/tool.rb', 'prevent_this_package_from_exposing_an_untyped_api'
-            )
+            expect(offenses).to contain_exactly(0).offense
           end
 
           it 'fails if there is a public API file in the rubocop TODO list' do
@@ -714,6 +708,23 @@ describe PackageProtections do
 
             offenses = PackageProtections.get_offenses(packages: get_packages, new_violations: [])
             expect(offenses).to contain_exactly(0).offenses
+          end
+
+          context 'when the pack with the protection is the root pack' do
+            it 'succeeds if there is a different pack\'s public API file in the rubocop TODO list' do
+              write_package_yml('.', protections: { 'prevent_this_package_from_exposing_an_untyped_api' => 'fail_on_any' })
+
+              write_file('app/public/tool.rb', '')
+              write_file('packs/other_pack/app/public/tool.rb', '')
+              write_file('.rubocop_todo.yml', <<~YML.strip)
+                PackageProtections/TypedPublicApi:
+                  Exclude:
+                    - packs/other_pack/app/public/tool.rb
+              YML
+
+              offenses = PackageProtections.get_offenses(packages: get_packages, new_violations: [])
+              expect(offenses).to contain_exactly(0).offenses
+            end
           end
         end
       end

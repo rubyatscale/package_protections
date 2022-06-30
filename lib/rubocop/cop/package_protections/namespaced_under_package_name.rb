@@ -7,7 +7,10 @@ module RuboCop
   module Cop
     module PackageProtections
       class NamespacedUnderPackageName < Base
+        extend T::Sig
+
         include RangeHelp
+        include ::PackageProtections::RubocopProtectionInterface
 
         def on_new_investigation
           absolute_filepath = Pathname.new(processed_source.file_path)
@@ -83,6 +86,77 @@ module RuboCop
               )
             )
           end
+        end
+
+        IDENTIFIER = 'prevent_this_package_from_creating_other_namespaces'.freeze
+
+        sig { override.returns(String) }
+        def identifier
+          IDENTIFIER
+        end
+
+        sig { override.params(behavior: ::PackageProtections::ViolationBehavior, package: ParsePackwerk::Package).returns(T.nilable(String)) }
+        def unmet_preconditions_for_behavior(behavior, package)
+          if !behavior.enabled? && !package.metadata['global_namespaces'].nil?
+            "Invalid configuration for package `#{package.name}`. `#{identifier}` must be turned on to use `global_namespaces` configuration."
+          else
+            # We don't need to validate if the behavior is currentely fail_never
+            return if behavior.fail_never?
+
+            # The reason for this is precondition is the `MultipleNamespacesProtection` assumes this to work properly.
+            # To remove this precondition, we need to modify `MultipleNamespacesProtection` to be more generalized!
+            if ::PackageProtections::EXPECTED_PACK_DIRECTORIES.include?(Pathname.new(package.name).dirname.to_s) || package.name == ParsePackwerk::ROOT_PACKAGE_NAME
+              nil
+            else
+              "Package #{package.name} must be located in one of #{::PackageProtections::EXPECTED_PACK_DIRECTORIES.join(', ')} (or be the root) to use this protection"
+            end
+          end
+        end
+
+        sig { override.returns(T::Array[String]) }
+        def included_globs_for_pack
+          [
+            'app/**/*',
+            'lib/**/*'
+          ]
+        end
+
+        sig do
+          params(package: ::PackageProtections::ProtectedPackage).returns(T::Hash[T.untyped, T.untyped])
+        end
+        def custom_cop_config(package)
+          {
+            'GlobalNamespaces' => package.metadata['global_namespaces']
+          }
+        end
+
+        sig do
+          override.params(file: String).returns(String)
+        end
+        def message_for_fail_on_any(file)
+          "`#{file}` should be namespaced under the package namespace"
+        end
+
+        sig { override.returns(String) }
+        def cop_name
+          'PackageProtections/NamespacedUnderPackageName'
+        end
+
+        sig { override.returns(String) }
+        def humanized_protection_name
+          'Multiple Namespaces Violations'
+        end
+
+        sig { override.returns(String) }
+        def humanized_protection_description
+          <<~MESSAGE
+            These files cannot have ANY modules/classes that are not submodules of the package's allowed namespaces.
+            This is failing because these files are in `.rubocop_todo.yml` under `#{cop_name}`.
+            If you want to be able to ignore these files, you'll need to open the file's package's `package.yml` file and
+            change `#{IDENTIFIER}` to `#{::PackageProtections::ViolationBehavior::FailOnNew.serialize}`
+
+            See https://go/packwerk_cheatsheet_namespaces for more info.
+          MESSAGE
         end
 
         private

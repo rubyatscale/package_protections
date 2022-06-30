@@ -25,7 +25,7 @@ module PackageProtections
         { name => cop_config }.to_yaml.gsub("---\n", '')
       end
     end
-    
+
     include ProtectionInterface
     extend T::Sig
     extend T::Helpers
@@ -36,18 +36,15 @@ module PackageProtections
     # Abstract Methods: These are methods that the client needs to implement
     ############################################################################
     sig { abstract.returns(String) }
-    def cop_name
-    end
+    def cop_name; end
 
     sig do
       abstract.params(file: String).returns(String)
     end
-    def message_for_fail_on_any(file)
-    end
+    def message_for_fail_on_any(file); end
 
     sig { abstract.returns(T::Array[String]) }
-    def included_globs_for_pack
-    end
+    def included_globs_for_pack; end
 
     ###########################################################################
     # Overriddable Methods: These are methods that the client can override,
@@ -61,8 +58,7 @@ module PackageProtections
     end
 
     sig { override.params(behavior: ViolationBehavior, package: ParsePackwerk::Package).returns(T.nilable(String)) }
-    def unmet_preconditions_for_behavior(behavior, package)
-    end
+    def unmet_preconditions_for_behavior(behavior, package); end
 
     sig do
       override.params(
@@ -129,16 +125,16 @@ module PackageProtections
     end
 
     sig do
-      params(packages: T::Array[ProtectedPackage]).
-      returns(T::Array[CopConfig])
+      params(packages: T::Array[ProtectedPackage])
+      .returns(T::Array[CopConfig])
     end
     def cop_configs(packages)
       include_paths = T.let([], T::Array[String])
       packages.each do |p|
-        if p.violation_behavior_for(identifier).enabled?
-          included_globs_for_pack.each do |glob|
-            include_paths << p.original_package.directory.join(glob).to_s
-          end
+        next unless p.violation_behavior_for(identifier).enabled?
+
+        included_globs_for_pack.each do |glob|
+          include_paths << p.original_package.directory.join(glob).to_s
         end
       end
 

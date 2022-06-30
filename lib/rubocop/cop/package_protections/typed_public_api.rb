@@ -21,7 +21,7 @@ module RuboCop
         include ::PackageProtections::ProtectionInterface
         include ::PackageProtections::RubocopProtectionInterface
 
-        IDENTIFIER = 'prevent_this_package_from_exposing_an_untyped_api'
+        IDENTIFIER = 'prevent_this_package_from_exposing_an_untyped_api'.freeze
 
         sig { override.returns(String) }
         def identifier
@@ -44,7 +44,7 @@ module RuboCop
         sig { override.returns(T::Array[String]) }
         def included_globs_for_pack
           [
-            'app/public/**/*',
+            'app/public/**/*'
           ]
         end
 

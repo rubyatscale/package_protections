@@ -88,8 +88,7 @@ module RuboCop
           end
         end
 
-
-        IDENTIFIER = 'prevent_this_package_from_creating_other_namespaces'
+        IDENTIFIER = 'prevent_this_package_from_creating_other_namespaces'.freeze
 
         sig { override.returns(String) }
         def identifier
@@ -118,7 +117,7 @@ module RuboCop
         def included_globs_for_pack
           [
             'app/**/*',
-            'lib/**/*',
+            'lib/**/*'
           ]
         end
 

@@ -108,7 +108,7 @@ module PackageProtections
           T.absurd(violation_behavior)
         end
 
-        package.original_package.directory.glob('**/**/*.*').each do |relative_path_to_file|
+        package.original_package.directory.glob(included_globs_for_pack).each do |relative_path_to_file|
           next unless exclude_list.include?(relative_path_to_file.to_s)
 
           file = relative_path_to_file.to_s

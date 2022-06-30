@@ -21,7 +21,7 @@ module RuboCop
         include ::PackageProtections::ProtectionInterface
         include ::PackageProtections::RubocopProtectionInterface
 
-        IDENTIFIER = 'prevent_this_package_from_exposing_an_untyped_api'.freeze
+        IDENTIFIER = T.let('prevent_this_package_from_exposing_an_untyped_api'.freeze, String)
 
         sig { override.returns(String) }
         def identifier

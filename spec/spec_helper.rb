@@ -1,8 +1,7 @@
 require 'pry'
 require 'package_protections'
 require 'rubocop/rspec/support'
-
-require_relative 'support/application_fixture_helper'
+require 'package_protections/rspec/support'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

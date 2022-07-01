@@ -1,7 +1,8 @@
 def offense(
   package_name, message, file, violation_type
 )
-  package = get_packages.find { |p| p.name == package_name }
+
+  package = ParsePackwerk.all.find { |p| p.name == package_name }
   PackageProtections::Offense.new(
     package: package,
     message: message,

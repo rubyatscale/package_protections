@@ -7,11 +7,15 @@ require_relative 'matchers'
 
 def get_resulting_rubocop
   write_file('config/default.yml', <<~YML.strip)
-    <%= PackageProtections.rubocop_yml %>
+    <%= PackageProtections.rubocop_yml(root_pathname: Pathname.pwd) %>
   YML
   YAML.safe_load(ERB.new(File.read('config/default.yml')).result(binding))
 end
 
 RSpec.configure do |config|
   config.include ApplicationFixtureHelper
+
+  config.before do |example|
+    PackageProtections.bust_cache!
+  end
 end

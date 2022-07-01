@@ -68,7 +68,7 @@ RSpec::Matchers.define(:contain_exactly) do |number_of_offenses|
   match do |actual_offenses|
     @actual_offenses = actual_offenses || []
     @offenses = []
-    @actual_offenses.select do |offense|
+    @actual_offenses.each do |offense|
       @offenses << offense
     end
     @offenses.size == number_of_offenses

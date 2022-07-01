@@ -9,7 +9,7 @@ def get_resulting_rubocop
   write_file('config/default.yml', <<~YML.strip)
     <%= PackageProtections.rubocop_yml %>
   YML
-  YAML.safe_load(ERB.new(YAML.load_file('config/default.yml')).result(binding))
+  YAML.safe_load(ERB.new(File.read('config/default.yml')).result(binding))
 end
 
 RSpec.configure do |config|

@@ -15,7 +15,7 @@ end
 RSpec.configure do |config|
   config.include ApplicationFixtureHelper
 
-  config.before do |example|
+  config.before do
     PackageProtections.bust_cache!
   end
 end

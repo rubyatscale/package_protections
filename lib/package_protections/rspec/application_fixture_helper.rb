@@ -20,13 +20,10 @@ module ApplicationFixtureHelper
     global_namespaces: [],
     visible_to: []
   )
-    defaults = {
-      'prevent_this_package_from_violating_its_stated_dependencies' => 'fail_on_new',
-      'prevent_other_packages_from_using_this_packages_internals' => 'fail_on_new',
-      'prevent_this_package_from_exposing_an_untyped_api' => 'fail_on_new',
-      'prevent_this_package_from_creating_other_namespaces' => 'fail_on_new',
-      'prevent_other_packages_from_using_this_package_without_explicit_visibility' => 'fail_never'
-    }
+    defaults = PackageProtections
+      .all
+      .to_h { |p| [p.identifier, p.default_behavior.serialize] }
+
     protections_with_defaults = defaults.merge(protections)
     metadata = { 'protections' => protections_with_defaults }
     if visible_to.any?

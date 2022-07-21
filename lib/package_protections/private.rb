@@ -136,7 +136,8 @@ module PackageProtections
       @protected_packages_indexed_by_name ||= all_protected_packages.each_with_object({}) { |package, index|
         index[package.name] = package
       }
-      @protected_packages_indexed_by_name[name] || raise(StandardError, "Could not find package #{name}")
+
+      @protected_packages_indexed_by_name.fetch(name)
     end
 
     sig { void }

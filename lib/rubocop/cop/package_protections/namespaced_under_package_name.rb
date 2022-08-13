@@ -23,6 +23,8 @@ module RuboCop
           match = relative_filename.match(%r{((#{::PackageProtections::EXPECTED_PACK_DIRECTORIES.join("|")})/.*?)/})
           package_name = match && match[1]
 
+          # Get `package_name` using `ParsePackage.package_from_path`.
+          # Subtract the package name and then the rest should be history.
           return if package_name.nil?
 
           return if relative_filepath.extname != '.rb'

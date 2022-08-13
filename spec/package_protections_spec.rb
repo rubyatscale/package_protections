@@ -14,6 +14,7 @@ describe PackageProtections do
   end
 
   def get_packages
+    ParsePackwerk.bust_cache!
     ParsePackwerk.all
   end
 

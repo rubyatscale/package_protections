@@ -105,7 +105,11 @@ module RuboCop
 
             # The reason for this is precondition is the `MultipleNamespacesProtection` assumes this to work properly.
             # To remove this precondition, we need to modify `MultipleNamespacesProtection` to be more generalized!
-            if ::PackageProtections::EXPECTED_PACK_DIRECTORIES.include?(Pathname.new(package.name).dirname.to_s) || package.name == ParsePackwerk::ROOT_PACKAGE_NAME
+            is_root_package = package.name == ParsePackwerk::ROOT_PACKAGE_NAME
+            in_allowed_directory = ::PackageProtections::EXPECTED_PACK_DIRECTORIES.any? do |expected_package_directory|
+              package.directory.to_s.start_with?(expected_package_directory)
+            end
+            if in_allowed_directory || is_root_package
               nil
             else
               "Package #{package.name} must be located in one of #{::PackageProtections::EXPECTED_PACK_DIRECTORIES.join(', ')} (or be the root) to use this protection"

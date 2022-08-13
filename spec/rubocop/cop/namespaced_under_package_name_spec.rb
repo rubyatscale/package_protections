@@ -8,6 +8,7 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
 
   before do
     write_package_yml('packs/apples', global_namespaces: global_namespaces)
+    write_package_yml('packs/fruits/apples', global_namespaces: global_namespaces)
     PackageProtections.bust_cache!
   end
 
@@ -230,7 +231,7 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
         let(:source) do
           <<~RUBY
             class Tool
-            ^ `packs/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/apples/app/services/apples/tool.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
+            ^ `packs/fruits/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/fruits/apples/app/services/apples/tool.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
             end
           RUBY
         end
@@ -242,7 +243,7 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
         let(:source) do
           <<~RUBY
             module Tools
-            ^ `packs/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/apples/app/services/apples/tools/blah.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
+            ^ `packs/fruits/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/fruits/apples/app/services/apples/tools/blah.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
               class Blah
               end
             end
@@ -284,7 +285,7 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
         let(:source) do
           <<~RUBY
             class Tool
-            ^ `packs/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/apples/app/services/apples/tool.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
+            ^ `packs/fruits/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/fruits/apples/app/services/apples/tool.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
             end
           RUBY
         end
@@ -296,7 +297,7 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
         let(:source) do
           <<~RUBY
             module Tools
-            ^ `packs/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/apples/app/services/apples/tools/blah.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
+            ^ `packs/fruits/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/fruits/apples/app/services/apples/tools/blah.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
               class Blah
               end
             end
@@ -338,7 +339,7 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
         let(:source) do
           <<~RUBY
             class Tool
-            ^ `packs/apples` prevents modules/classes that are not submodules of one of the allowed namespaces in `packs/apples/package.yml`. See https://go/packwerk_cheatsheet_namespaces for more info.
+            ^ `packs/fruits/apples` prevents modules/classes that are not submodules of one of the allowed namespaces in `packs/fruits/apples/package.yml`. See https://go/packwerk_cheatsheet_namespaces for more info.
             end
           RUBY
         end
@@ -350,7 +351,7 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
         let(:source) do
           <<~RUBY
             module Tools
-            ^ `packs/apples` prevents modules/classes that are not submodules of one of the allowed namespaces in `packs/apples/package.yml`. See https://go/packwerk_cheatsheet_namespaces for more info.
+            ^ `packs/fruits/apples` prevents modules/classes that are not submodules of one of the allowed namespaces in `packs/fruits/apples/package.yml`. See https://go/packwerk_cheatsheet_namespaces for more info.
               class Blah
               end
             end
@@ -417,7 +418,7 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
       let(:source) do
         <<~RUBY
           class Tool
-          ^ `packs/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/apples/app/models/concerns/apples/tool.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
+          ^ `packs/fruits/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/fruits/apples/app/models/concerns/apples/tool.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
           end
         RUBY
       end

@@ -20,7 +20,7 @@ module RuboCop
           # This cop only works for files in `app`
           return if !relative_filename.include?('app/')
 
-          package_name = ParsePackwerk.package_from_path(relative_filename)
+          package_name = T.must(ParsePackwerk.package_from_path(relative_filename)).name
           # Get `package_name` using `ParsePackage.package_from_path`.
           # Subtract the package name and then the rest should be history.
           return if package_name.nil?

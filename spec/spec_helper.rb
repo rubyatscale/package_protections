@@ -20,6 +20,11 @@ RSpec.configure do |config|
   config.shared_context_metadata_behavior = :apply_to_host_groups
 
   config.around do |example|
+    ParsePackwerk.bust_cache!
+    example.run
+  end
+
+  config.around do |example|
     prefix = [File.basename($0), Process.pid].join('-') # rubocop:disable Style/SpecialGlobalVars
     tmpdir = Dir.mktmpdir(prefix)
 

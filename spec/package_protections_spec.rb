@@ -14,6 +14,7 @@ describe PackageProtections do
   end
 
   def get_packages
+    ParsePackwerk.bust_cache!
     ParsePackwerk.all
   end
 
@@ -734,6 +735,48 @@ describe PackageProtections do
             offenses = PackageProtections.get_offenses(packages: get_packages, new_violations: [])
             expect(offenses).to be_empty
           end
+
+          context 'the package is nested' do
+            let(:apples_package_yml_with_namespace_protection_set_to_fail_on_new) do
+              write_package_yml('packs/apples/subpack', global_namespaces: apples_global_namespaces, protections: { 'prevent_this_package_from_creating_other_namespaces' => 'fail_on_new' })
+            end
+
+            context 'global_namespaces is unset' do
+              let(:apples_global_namespaces) { [] }
+
+              it 'generates the expected rubocop.yml entries' do
+                apples_package_yml_with_namespace_protection_set_to_fail_on_new
+                cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
+                expect(cop_config['Exclude']).to eq(nil)
+                expect(cop_config['Include']).to eq(['packs/apples/subpack/app/**/*', 'packs/apples/subpack/lib/**/*'])
+                expect(cop_config['Enabled']).to eq(true)
+              end
+            end
+
+            context 'global_namespaces is set' do
+              let(:apples_global_namespaces) { %w[AppleTrees Ciders Apples] }
+
+              it 'generates the expected rubocop.yml entries' do
+                apples_package_yml_with_namespace_protection_set_to_fail_on_new
+                cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
+                expect(cop_config['Exclude']).to eq(nil)
+                expect(cop_config['Include']).to eq(['packs/apples/subpack/app/**/*', 'packs/apples/subpack/lib/**/*'])
+                expect(cop_config['Enabled']).to eq(true)
+              end
+
+              it 'retrieves the right rubocop metadata' do
+                apples_package_yml_with_namespace_protection_set_to_fail_on_new
+                private_cop_config = PackageProtections.private_cop_config('prevent_this_package_from_creating_other_namespaces')
+                expect(private_cop_config['packs/apples/subpack']).to eq({ 'GlobalNamespaces' => %w[AppleTrees Ciders Apples] })
+              end
+            end
+
+            it 'is implemented by Rubocop' do
+              apples_package_yml_with_namespace_protection_set_to_fail_on_new
+              offenses = PackageProtections.get_offenses(packages: get_packages, new_violations: [])
+              expect(offenses).to be_empty
+            end
+          end
         end
 
         context 'set to fail_on_any' do
@@ -1279,70 +1322,6 @@ describe PackageProtections do
                                                            'prevent_this_package_from_exposing_an_untyped_api' => 'fail_on_new',
                                                            'prevent_this_package_from_violating_its_stated_dependencies' => 'fail_on_any'
                                                          })
-    end
-  end
-
-  describe 'packages_for_names' do
-    context 'can find the package' do
-      it 'returns the package' do
-        write_file('package.yml', <<~YML.strip)
-          enforce_dependencies: true
-          enforce_privacy: true
-        YML
-
-        write_file('packs/apples/package.yml', <<~YML.strip)
-          enforce_dependencies: true
-          enforce_privacy: true
-        YML
-
-        write_file('packs/zebras/package.yml', <<~YML.strip)
-          enforce_dependencies: true
-          enforce_privacy: true
-        YML
-
-        packages = PackageProtections.packages_for_names(['packs/apples'], get_packages)
-        expect(packages.count).to eq 1
-        expect(packages.first.name).to eq 'packs/apples'
-      end
-    end
-
-    context 'cannot find the package' do
-      it 'prints out available packages in sorted order' do
-        write_file('package.yml', <<~YML.strip)
-          enforce_dependencies: true
-          enforce_privacy: true
-        YML
-
-        write_file('packs/apples/package.yml', <<~YML.strip)
-          enforce_dependencies: true
-          enforce_privacy: true
-        YML
-
-        write_file('packs/zebras/package.yml', <<~YML.strip)
-          enforce_dependencies: true
-          enforce_privacy: true
-        YML
-
-        expected_error_message = <<~MESSAGE
-          Sorry, we couldn't find a package with name packs/elephants. Here are all of the package names we know about: [".", "packs/apples", "packs/zebras"]
-        MESSAGE
-
-        expect { PackageProtections.packages_for_names(['packs/elephants'], get_packages) }
-          .to raise_error expected_error_message.chomp
-      end
-    end
-
-    context 'package is root package, and we refer to it using the name .' do
-      it 'returns the package' do
-        write_file('package.yml', <<~YML.strip)
-          enforce_dependencies: true
-          enforce_privacy: true
-        YML
-
-        packages = PackageProtections.packages_for_names([ParsePackwerk::ROOT_PACKAGE_NAME], get_packages)
-        expect(packages.count).to eq 1
-        expect(packages.first.name).to eq ParsePackwerk::ROOT_PACKAGE_NAME
-      end
     end
   end
 end

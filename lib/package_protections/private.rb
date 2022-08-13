@@ -88,27 +88,6 @@ module PackageProtections
       end
     end
 
-    sig do
-      params(
-        package_names: T::Array[String],
-        all_packages: T::Array[ParsePackwerk::Package]
-      ).returns(T::Array[ParsePackwerk::Package])
-    end
-    def self.packages_for_names(package_names, all_packages)
-      all_packages_indexed_by_name = {}
-      all_packages.each { |package| all_packages_indexed_by_name[package.name] = package }
-
-      package_names.map do |package_name|
-        clean_pack_name = package_name.gsub(%r{/$}, '')
-        package = all_packages_indexed_by_name[clean_pack_name]
-        if package.nil?
-          raise "Sorry, we couldn't find a package with name #{package_name}. Here are all of the package names we know about: #{all_packages.map(&:name).sort.inspect}"
-        end
-
-        package
-      end
-    end
-
     sig { params(root_pathname: Pathname).returns(String) }
     def self.rubocop_yml(root_pathname:)
       protected_packages = Dir.chdir(root_pathname) { all_protected_packages }

@@ -20,9 +20,7 @@ module RuboCop
           # This cop only works for files in `app`
           return if !relative_filename.include?('app/')
 
-          match = relative_filename.match(%r{((#{::PackageProtections::EXPECTED_PACK_DIRECTORIES.join("|")})/.*?)/})
-          package_name = match && match[1]
-
+          package_name = ParsePackwerk.package_from_path(relative_filename)&.name
           return if package_name.nil?
 
           return if relative_filepath.extname != '.rb'
@@ -105,7 +103,11 @@ module RuboCop
 
             # The reason for this is precondition is the `MultipleNamespacesProtection` assumes this to work properly.
             # To remove this precondition, we need to modify `MultipleNamespacesProtection` to be more generalized!
-            if ::PackageProtections::EXPECTED_PACK_DIRECTORIES.include?(Pathname.new(package.name).dirname.to_s) || package.name == ParsePackwerk::ROOT_PACKAGE_NAME
+            is_root_package = package.name == ParsePackwerk::ROOT_PACKAGE_NAME
+            in_allowed_directory = ::PackageProtections::EXPECTED_PACK_DIRECTORIES.any? do |expected_package_directory|
+              package.directory.to_s.start_with?(expected_package_directory)
+            end
+            if in_allowed_directory || is_root_package
               nil
             else
               "Package #{package.name} must be located in one of #{::PackageProtections::EXPECTED_PACK_DIRECTORIES.join(', ')} (or be the root) to use this protection"

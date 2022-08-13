@@ -116,16 +116,6 @@ module PackageProtections
     Private.private_cop_config(identifier)
   end
 
-  sig do
-    params(
-      package_names: T::Array[String],
-      all_packages: T::Array[ParsePackwerk::Package]
-    ).returns(T::Array[ParsePackwerk::Package])
-  end
-  def self.packages_for_names(package_names, all_packages)
-    Private.packages_for_names(package_names, all_packages)
-  end
-
   sig { void }
   def self.bust_cache!
     Private.bust_cache!

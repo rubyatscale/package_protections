@@ -20,9 +20,7 @@ module RuboCop
           # This cop only works for files in `app`
           return if !relative_filename.include?('app/')
 
-          match = relative_filename.match(%r{((#{::PackageProtections::EXPECTED_PACK_DIRECTORIES.join("|")})/.*?)/})
-          package_name = match && match[1]
-
+          package_name = ParsePackwerk.package_from_path(relative_filename)
           # Get `package_name` using `ParsePackage.package_from_path`.
           # Subtract the package name and then the rest should be history.
           return if package_name.nil?

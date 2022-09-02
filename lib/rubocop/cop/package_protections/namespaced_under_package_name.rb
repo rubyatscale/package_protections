@@ -6,6 +6,12 @@ require 'active_support/core_ext/string/inflections'
 module RuboCop
   module Cop
     module PackageProtections
+      #
+      # TODO:
+      # This class is in serious need of being split up into helpful abstractions.
+      # A really helpful abstraction would be one that takes a file path and can spit out information about
+      # namespacing, such as the exposed namespace, the file path for a different namespace, and more.
+      #
       class NamespacedUnderPackageName < Base
         extend T::Sig
 
@@ -20,8 +26,10 @@ module RuboCop
           # This cop only works for files in `app`
           return if !relative_filename.include?('app/')
 
-          package_name = ParsePackwerk.package_from_path(relative_filename)&.name
-          return if package_name.nil?
+          package_for_path = ParsePackwerk.package_from_path(relative_filename)
+          return if package_for_path.nil?
+
+          package_name = package_for_path.name
 
           return if relative_filepath.extname != '.rb'
 
@@ -50,10 +58,23 @@ module RuboCop
 
           remaining_file_path = path_without_package_base.gsub(%r{\A#{autoload_folder_name}/}, '')
           actual_namespace = get_actual_namespace(remaining_file_path, relative_filepath, package_name)
+
+          all_packs_enforcing_namespaces = ParsePackwerk.all.reject do |p|
+            ::PackageProtections::ProtectedPackage.from(p).violation_behavior_for(identifier).fail_never?
+          end
+
+          namespaces_to_packs = {}
+          all_packs_enforcing_namespaces.each do |package|
+            namespaces_to_packs[pack_based_namespace(package.name)] = package.name
+          end
+
+          package_enforces_namespaces = !::PackageProtections::ProtectedPackage.from(package_for_path).violation_behavior_for(identifier).fail_never?
+          pack_owning_this_namespace = namespaces_to_packs[actual_namespace]
+
           allowed_namespaces = get_allowed_namespaces(package_name)
           if allowed_namespaces.include?(actual_namespace)
             # No problem!
-          elsif allowed_namespaces.count == 1
+          else
             single_allowed_namespace = allowed_namespaces.first
             if relative_filepath.to_s.include?('app/')
               app_or_lib = 'app'
@@ -64,26 +85,56 @@ module RuboCop
             absolute_desired_path = root_pathname.join(package_name, app_or_lib, T.must(autoload_folder_name), single_allowed_namespace.underscore, remaining_file_path)
 
             relative_desired_path = absolute_desired_path.relative_path_from(root_pathname)
-
-            add_offense(
-              source_range(processed_source.buffer, 1, 0),
-              message: format(
-                '`%<package_name>s` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `%<expected_namespace>s` with path `%<expected_path>s`. See https://go/packwerk_cheatsheet_namespaces for more info.',
-                package_name: package_name,
-                expected_namespace: package_last_name.camelize,
-                expected_path: relative_desired_path
+            if package_enforces_namespaces
+              add_offense(
+                source_range(processed_source.buffer, 1, 0),
+                message: format(
+                  '`%<package_name>s` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `%<expected_namespace>s` with path `%<expected_path>s`. See https://go/packwerk_cheatsheet_namespaces for more info.',
+                  package_name: package_name,
+                  expected_namespace: package_last_name.camelize,
+                  expected_path: relative_desired_path
+                )
               )
-            )
-          else
-            add_offense(
-              source_range(processed_source.buffer, 1, 0),
-              message: format(
-                '`%<package_name>s` prevents modules/classes that are not submodules of one of the allowed namespaces in `%<package_yml>s`. See https://go/packwerk_cheatsheet_namespaces for more info.',
-                package_name: package_name,
-                package_yml: "#{package_name}/package.yml"
+            elsif pack_owning_this_namespace
+              add_offense(
+                source_range(processed_source.buffer, 1, 0),
+                message: format(
+                  '`%<pack_owning_this_namespace>s` prevents other packs from sitting in the `%<actual_namespace>s` namespace. This should be namespaced under `%<expected_namespace>s` with path `%<expected_path>s`. See https://go/packwerk_cheatsheet_namespaces for more info.',
+                  package_name: package_name,
+                  pack_owning_this_namespace: pack_owning_this_namespace,
+                  expected_namespace: package_last_name.camelize,
+                  actual_namespace: actual_namespace,
+                  expected_path: relative_desired_path
+                )
               )
-            )
+            end
           end
+        end
+
+        # We override `cop_configs` for this protection.
+        # The default behavior disables cops when a package has turned off a protection.
+        # However: namespace violations can occur even when one package has TURNED OFF their namespace protection
+        # but another package has it turned on. Therefore, all packages must always be opted in no matter what.
+        #
+        sig do
+          params(packages: T::Array[::PackageProtections::ProtectedPackage])
+          .returns(T::Array[::PackageProtections::RubocopProtectionInterface::CopConfig])
+        end
+        def cop_configs(packages)
+          include_paths = T.let([], T::Array[String])
+          packages.each do |p|
+            included_globs_for_pack.each do |glob|
+              include_paths << p.original_package.directory.join(glob).to_s
+            end
+          end
+
+          [
+            ::PackageProtections::RubocopProtectionInterface::CopConfig.new(
+              name: cop_name,
+              enabled: include_paths.any?,
+              include_paths: include_paths
+            )
+          ]
         end
 
         IDENTIFIER = 'prevent_this_package_from_creating_other_namespaces'.freeze
@@ -124,15 +175,6 @@ module RuboCop
         end
 
         sig do
-          params(package: ::PackageProtections::ProtectedPackage).returns(T::Hash[T.untyped, T.untyped])
-        end
-        def custom_cop_config(package)
-          {
-            'GlobalNamespaces' => package.metadata['global_namespaces']
-          }
-        end
-
-        sig do
           override.params(file: String).returns(String)
         end
         def message_for_fail_on_any(file)
@@ -163,9 +205,15 @@ module RuboCop
 
         private
 
+        def pack_based_namespace(package_name)
+          package_name.split('/').last.camelize
+        end
+
         def get_allowed_namespaces(package_name)
-          cop_config = ::PackageProtections.private_cop_config('prevent_this_package_from_creating_other_namespaces')
-          allowed_global_namespaces = cop_config[package_name]['GlobalNamespaces'] || [package_name.split('/').last.camelize]
+          allowed_global_namespaces = [
+            pack_based_namespace(package_name),
+            *::PackageProtections.config.globally_permitted_namespaces
+          ]
           Set.new(allowed_global_namespaces)
         end
 

@@ -44,13 +44,19 @@ module PackageProtections
 
     sig { params(blk: T.proc.params(arg0: Private::Configuration).void).void }
     def configure(&blk)
-      yield(Private.config)
+      yield(PackageProtections.config)
     end
   end
 
   sig { returns(T::Array[ProtectionInterface]) }
   def self.all
-    Private.config.protections
+    config.protections
+  end
+
+  sig { returns(Private::Configuration) }
+  def self.config
+    @config = T.let(@config, T.nilable(Private::Configuration))
+    @config ||= Private::Configuration.new
   end
 
   #

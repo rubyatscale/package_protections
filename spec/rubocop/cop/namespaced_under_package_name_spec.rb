@@ -4,16 +4,19 @@
 
 RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
   subject(:cop) { described_class.new }
-  let(:global_namespaces) { {} }
+  let(:global_namespaces) { [] }
 
   before do
-    write_package_yml('packs/apples', global_namespaces: global_namespaces)
-    write_package_yml('packs/fruits/apples', global_namespaces: global_namespaces)
+    write_package_yml('packs/apples')
+    write_package_yml('packs/fruits/apples')
     PackageProtections.bust_cache!
+    PackageProtections.configure do |config|
+      config.globally_permitted_namespaces = global_namespaces
+    end
   end
 
   context 'unnested pack' do
-    context 'global namespaces are not explicitly defined' do
+    context 'globally permitted namespaces not configured' do
       context 'when file establishes different namespace' do
         let(:source) do
           <<~RUBY
@@ -65,68 +68,14 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
       end
     end
 
-    context 'global namespaces is defined and is same as package name' do
-      let(:global_namespaces) { %w[Apples] }
-
-      context 'when file establishes different namespace' do
-        let(:source) do
-          <<~RUBY
-            class Tool
-            ^ `packs/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/apples/app/services/apples/tool.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
-            end
-          RUBY
-        end
-
-        it { expect_offense source, Pathname.pwd.join(write_file('packs/apples/app/services/tool.rb')).to_s }
-      end
-
-      context 'when file is in different namespace' do
-        let(:source) do
-          <<~RUBY
-            module Tools
-            ^ `packs/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/apples/app/services/apples/tools/blah.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
-              class Blah
-              end
-            end
-          RUBY
-        end
-
-        it { expect_offense source, Pathname.pwd.join(write_file('packs/apples/app/services/tools/blah.rb')).to_s }
-      end
-
-      context 'when file establishes primary namespace' do
-        let(:source) do
-          <<~RUBY
-            module Apples
-            end
-          RUBY
-        end
-
-        it { expect_no_offenses source, Pathname.pwd.join(write_file('packs/apples/app/services/apples.rb')).to_s }
-      end
-
-      context 'when file is in package namespace' do
-        let(:source) do
-          <<~RUBY
-            module Apples
-              class Tool
-              end
-            end
-          RUBY
-        end
-
-        it { expect_no_offenses source, Pathname.pwd.join(write_file('packs/apples/app/services/apples/tool.rb')).to_s }
-      end
-    end
-
-    context 'several global namespaces are provided' do
+    context 'several globally permitted namespaces are provided' do
       let(:global_namespaces) { %w[AppleTrees ApplePies Ciders] }
 
       context 'when file establishes different namespace' do
         let(:source) do
           <<~RUBY
             class Tool
-            ^ `packs/apples` prevents modules/classes that are not submodules of one of the allowed namespaces in `packs/apples/package.yml`. See https://go/packwerk_cheatsheet_namespaces for more info.
+            ^ `packs/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/apples/app/services/apples/tool.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
             end
           RUBY
         end
@@ -138,7 +87,7 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
         let(:source) do
           <<~RUBY
             module Tools
-            ^ `packs/apples` prevents modules/classes that are not submodules of one of the allowed namespaces in `packs/apples/package.yml`. See https://go/packwerk_cheatsheet_namespaces for more info.
+            ^ `packs/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/apples/app/services/apples/tools/blah.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
               class Blah
               end
             end
@@ -223,10 +172,55 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
 
       it { expect_no_offenses source, Pathname.pwd.join(write_file('packs/apples/app/models/concerns/apples.rb')).to_s }
     end
+
+    context 'when files pack does not have namespace protection configured' do
+      before do
+        write_package_yml('packs/apples', protections: {
+                            'prevent_this_package_from_creating_other_namespaces' => 'fail_never'
+                          })
+      end
+
+      context 'when no other pack has namespace protection configured' do
+        context 'when file is in different namespace' do
+          let(:source) do
+            <<~RUBY
+              module Tools
+                class Blah
+                end
+              end
+            RUBY
+          end
+
+          it { expect_no_offenses source, Pathname.pwd.join(write_file('packs/apples/app/services/tools/blah.rb')).to_s }
+        end
+      end
+
+      context 'when another pack has namespace protection configured' do
+        before do
+          write_package_yml('packs/tools', protections: {
+                              'prevent_this_package_from_creating_other_namespaces' => 'fail_on_new'
+                            })
+        end
+
+        context 'when file is in different namespace' do
+          let(:source) do
+            <<~RUBY
+              module Tools
+              ^ `packs/tools` prevents other packs from sitting in the `Tools` namespace. This should be namespaced under `Apples` with path `packs/apples/app/services/apples/tools/blah.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
+                class Blah
+                end
+              end
+            RUBY
+          end
+
+          it { expect_offense source, Pathname.pwd.join(write_file('packs/apples/app/services/tools/blah.rb')).to_s }
+        end
+      end
+    end
   end
 
   context 'nested pack' do
-    context 'global namespaces are not explicitly defined' do
+    context 'globally permitted namespaces not configured' do
       context 'when file establishes different namespace' do
         let(:source) do
           <<~RUBY
@@ -278,68 +272,14 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
       end
     end
 
-    context 'global namespaces is defined and is same as package name' do
-      let(:global_namespaces) { %w[Apples] }
-
-      context 'when file establishes different namespace' do
-        let(:source) do
-          <<~RUBY
-            class Tool
-            ^ `packs/fruits/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/fruits/apples/app/services/apples/tool.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
-            end
-          RUBY
-        end
-
-        it { expect_offense source, Pathname.pwd.join(write_file('packs/fruits/apples/app/services/tool.rb')).to_s }
-      end
-
-      context 'when file is in different namespace' do
-        let(:source) do
-          <<~RUBY
-            module Tools
-            ^ `packs/fruits/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/fruits/apples/app/services/apples/tools/blah.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
-              class Blah
-              end
-            end
-          RUBY
-        end
-
-        it { expect_offense source, Pathname.pwd.join(write_file('packs/fruits/apples/app/services/tools/blah.rb')).to_s }
-      end
-
-      context 'when file establishes primary namespace' do
-        let(:source) do
-          <<~RUBY
-            module Apples
-            end
-          RUBY
-        end
-
-        it { expect_no_offenses source, Pathname.pwd.join(write_file('packs/fruits/apples/app/services/apples.rb')).to_s }
-      end
-
-      context 'when file is in package namespace' do
-        let(:source) do
-          <<~RUBY
-            module Apples
-              class Tool
-              end
-            end
-          RUBY
-        end
-
-        it { expect_no_offenses source, Pathname.pwd.join(write_file('packs/fruits/apples/app/services/apples/tool.rb')).to_s }
-      end
-    end
-
-    context 'several global namespaces are provided' do
+    context 'several globally permitted namespaces are configured' do
       let(:global_namespaces) { %w[AppleTrees ApplePies Ciders] }
 
       context 'when file establishes different namespace' do
         let(:source) do
           <<~RUBY
             class Tool
-            ^ `packs/fruits/apples` prevents modules/classes that are not submodules of one of the allowed namespaces in `packs/fruits/apples/package.yml`. See https://go/packwerk_cheatsheet_namespaces for more info.
+            ^ `packs/fruits/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/fruits/apples/app/services/apples/tool.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
             end
           RUBY
         end
@@ -351,7 +291,7 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
         let(:source) do
           <<~RUBY
             module Tools
-            ^ `packs/fruits/apples` prevents modules/classes that are not submodules of one of the allowed namespaces in `packs/fruits/apples/package.yml`. See https://go/packwerk_cheatsheet_namespaces for more info.
+            ^ `packs/fruits/apples` prevents modules/classes that are not submodules of the package namespace. Should be namespaced under `Apples` with path `packs/fruits/apples/app/services/apples/tools/blah.rb`. See https://go/packwerk_cheatsheet_namespaces for more info.
               class Blah
               end
             end

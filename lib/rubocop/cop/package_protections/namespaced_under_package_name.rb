@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 
 # For String#camelize
 require 'active_support/core_ext/string/inflections'
@@ -18,6 +18,7 @@ module RuboCop
         include RangeHelp
         include ::PackageProtections::RubocopProtectionInterface
 
+        sig { void }
         def on_new_investigation
           absolute_filepath = Pathname.new(processed_source.file_path)
           relative_filepath = absolute_filepath.relative_path_from(Pathname.pwd)
@@ -57,7 +58,7 @@ module RuboCop
           end
 
           remaining_file_path = path_without_package_base.gsub(%r{\A#{autoload_folder_name}/}, '')
-          actual_namespace = get_actual_namespace(remaining_file_path, relative_filepath, package_name)
+          actual_namespace = get_actual_namespace(remaining_file_path, package_name)
 
           all_packs_enforcing_namespaces = ParsePackwerk.all.reject do |p|
             ::PackageProtections::ProtectedPackage.from(p).violation_behavior_for(identifier).fail_never?
@@ -82,7 +83,7 @@ module RuboCop
               app_or_lib = 'lib'
             end
 
-            absolute_desired_path = root_pathname.join(package_name, app_or_lib, T.must(autoload_folder_name), single_allowed_namespace.underscore, remaining_file_path)
+            absolute_desired_path = root_pathname.join(package_name, T.must(app_or_lib), T.must(autoload_folder_name), T.must(single_allowed_namespace).underscore, remaining_file_path)
 
             relative_desired_path = absolute_desired_path.relative_path_from(root_pathname)
             if package_enforces_namespaces
@@ -137,7 +138,7 @@ module RuboCop
           ]
         end
 
-        IDENTIFIER = 'prevent_this_package_from_creating_other_namespaces'.freeze
+        IDENTIFIER = T.let('prevent_this_package_from_creating_other_namespaces'.freeze, String)
 
         sig { override.returns(String) }
         def identifier
@@ -205,10 +206,12 @@ module RuboCop
 
         private
 
+        sig { params(package_name: String).returns(String) }
         def pack_based_namespace(package_name)
-          package_name.split('/').last.camelize
+          T.must(package_name.split('/').last).camelize
         end
 
+        sig { params(package_name: String).returns(T::Set[String]) }
         def get_allowed_namespaces(package_name)
           allowed_global_namespaces = [
             pack_based_namespace(package_name),
@@ -217,12 +220,14 @@ module RuboCop
           Set.new(allowed_global_namespaces)
         end
 
-        def get_actual_namespace(remaining_file_path, relative_filepath, package_name)
+        sig { params(remaining_file_path: String, package_name: String).returns(String) }
+        def get_actual_namespace(remaining_file_path, package_name)
           # If the remaining file path is a ruby file (not a directory), then it establishes a global namespace
           # Otherwise, per Zeitwerk's conventions as listed above, its a directory that establishes another global namespace
-          remaining_file_path.split('/').first.gsub('.rb', '').camelize
+          T.must(remaining_file_path.split('/').first).gsub('.rb', '').camelize
         end
 
+        sig {returns(Pathname)}
         def root_pathname
           Pathname.pwd
         end

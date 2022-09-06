@@ -110,3 +110,6 @@ Layout/FirstArgumentIndentation:
 # This leads to code that is not very readable at times (very long lines)
 Layout/ArgumentAlignment:
   Enabled: false
+
+Style/AccessorGrouping:
+  Enabled: false

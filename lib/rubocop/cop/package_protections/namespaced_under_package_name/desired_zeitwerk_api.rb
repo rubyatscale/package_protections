@@ -27,7 +27,6 @@ module RuboCop
           #
           sig { params(relative_filename: String, package_for_path: ParsePackwerk::Package).returns(T.nilable(NamespaceContext)) }
           def for_file(relative_filename, package_for_path)
-
             package_name = package_for_path.name
 
             # Zeitwerk establishes a standard convention by which namespaces are defined.
@@ -75,7 +74,7 @@ module RuboCop
             NamespaceContext.new(
               current_namespace: actual_namespace,
               expected_namespace: get_pack_based_namespace(package_for_path),
-              expected_filepath: relative_desired_path.to_s,
+              expected_filepath: relative_desired_path.to_s
             )
           end
 
@@ -86,7 +85,7 @@ module RuboCop
 
           private
 
-          sig {returns(Pathname)}
+          sig { returns(Pathname) }
           def root_pathname
             Pathname.pwd
           end

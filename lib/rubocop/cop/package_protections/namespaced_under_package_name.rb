@@ -27,6 +27,7 @@ module RuboCop
 
           # This cop only works for files ruby files in `app`
           return if !relative_filename.include?('app/') || relative_filepath.extname != '.rb'
+
           relative_filename = relative_filepath.to_s
           package_for_path = ParsePackwerk.package_from_path(relative_filename)
           return if package_for_path.nil?
@@ -35,9 +36,9 @@ module RuboCop
           return if namespace_context.nil?
 
           allowed_global_namespaces = Set.new([
-            namespace_context.expected_namespace,
-            *::PackageProtections.config.globally_permitted_namespaces
-          ])
+                                                namespace_context.expected_namespace,
+                                                *::PackageProtections.config.globally_permitted_namespaces
+                                              ])
 
           package_name = package_for_path.name
           actual_namespace = namespace_context.current_namespace
@@ -167,8 +168,6 @@ module RuboCop
             See https://go/packwerk_cheatsheet_namespaces for more info.
           MESSAGE
         end
-
-        private
 
         sig { returns(DesiredZeitwerkApi) }
         def self.desired_zeitwerk_api

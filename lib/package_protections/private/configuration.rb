@@ -6,9 +6,10 @@ module PackageProtections
       extend T::Sig
 
       sig { params(protections: T::Array[ProtectionInterface]).void }
-      attr_writer :protections, :globally_permitted_namespaces
+      attr_writer :protections
 
       sig { params(globally_permitted_namespaces: T::Array[String]).void }
+      attr_writer :globally_permitted_namespaces
 
       sig { void }
       def initialize

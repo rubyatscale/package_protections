@@ -231,6 +231,12 @@ module RuboCop
         def root_pathname
           Pathname.pwd
         end
+
+        sig { returns(DesiredZeitwerkApi) }
+        def self.desired_zeitwerk_api
+          @desired_zeitwerk_api ||= T.let(nil, T.nilable(DesiredZeitwerkApi))
+          @desired_zeitwerk_api ||= DesiredZeitwerkApi.new
+        end
       end
     end
   end

@@ -8,9 +8,13 @@ module PackageProtections
       sig { params(protections: T::Array[ProtectionInterface]).void }
       attr_writer :protections
 
+      sig { params(globally_permitted_namespaces: T::Array[String]).void }
+      attr_writer :globally_permitted_namespaces
+
       sig { void }
       def initialize
         @protections = T.let(default_protections, T::Array[ProtectionInterface])
+        @globally_permitted_namespaces = T.let([], T::Array[String])
       end
 
       sig { returns(T::Array[ProtectionInterface]) }
@@ -18,9 +22,15 @@ module PackageProtections
         @protections
       end
 
+      sig { returns(T::Array[String]) }
+      def globally_permitted_namespaces
+        @globally_permitted_namespaces
+      end
+
       sig { void }
       def bust_cache!
         @protections = default_protections
+        @globally_permitted_namespaces = []
       end
 
       sig { returns(T::Array[ProtectionInterface]) }

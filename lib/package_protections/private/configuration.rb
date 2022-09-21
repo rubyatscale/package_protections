@@ -25,6 +25,8 @@ module PackageProtections
 
       sig { returns(T::Array[ProtectionInterface]) }
       def default_protections
+        require 'rubocop/cop/package_protections'
+
         [
           Private::OutgoingDependencyProtection.new,
           Private::IncomingPrivacyProtection.new,

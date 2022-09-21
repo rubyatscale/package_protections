@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = 'package_protections'
-  spec.version       = '1.5.0'
+  spec.version       = '2.1.0'
   spec.authors       = ['Gusto Engineers']
   spec.email         = ['stephan.hagemann@gusto.com']
   spec.summary       = 'Package protections for Rails apps'
@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'rubocop'
   spec.add_dependency 'rubocop-sorbet'
   spec.add_dependency 'sorbet-runtime'
+  spec.add_dependency 'zeitwerk'
 
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'

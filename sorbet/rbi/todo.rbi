@@ -2,9 +2,9 @@
 #   srb rbi todo
 
 # typed: strong
-module ::RuboCop::RSpec::ExpectOffense; end
+module ::Zeitwerk::Loader; end
 module RSpec::Matchers; end
-
+module RuboCop::RSpec::ExpectOffense; end
 class Hash
   def to_yaml; end
 end

@@ -7,6 +7,11 @@ require 'open3'
 require 'set'
 require 'parse_packwerk'
 
+require "zeitwerk"
+loader = Zeitwerk::Loader.for_gem
+loader.ignore("#{__dir__}/rubocop")
+loader.setup
+
 # Welcome to PackageProtections!
 # See https://github.com/rubyatscale/package_protections#readme for more info
 #
@@ -23,14 +28,6 @@ module PackageProtections
 
   # This is currently the only handled exception that `PackageProtections` will throw.
   class IncorrectPublicApiUsageError < StandardError; end
-
-  autoload :Offense, 'package_protections/offense'
-  autoload :ViolationBehavior, 'package_protections/violation_behavior'
-  autoload :ProtectedPackage, 'package_protections/protected_package'
-  autoload :PerFileViolation, 'package_protections/per_file_violation'
-  autoload :ProtectionInterface, 'package_protections/protection_interface'
-  autoload :RubocopProtectionInterface, 'package_protections/rubocop_protection_interface'
-  autoload :Private, 'package_protections/private'
 
   class << self
     extend T::Sig
@@ -113,11 +110,5 @@ module PackageProtections
   def self.bust_cache!
     Private.bust_cache!
     RubocopProtectionInterface.bust_rubocop_todo_yml_cache
-  end
-end
-
-module Rubocop
-  module Cop
-    autoload :PackageProtections, 'rubocop/cop/package_protections'
   end
 end

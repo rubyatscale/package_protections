@@ -1,5 +1,6 @@
 require 'pry'
 require 'package_protections'
+require 'rubocop/cop/package_protections'
 require 'rubocop/rspec/support'
 require 'package_protections/rspec/support'
 

@@ -1,7 +1,7 @@
 require 'rubocop'
 require 'rubocop-sorbet'
 
-module Rubocop
+module RuboCop
   module Cop
     module PackageProtections
       autoload :NamespacedUnderPackageName, 'rubocop/cop/package_protections/namespaced_under_package_name'

@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 # typed: strict
+
 require 'sorbet-runtime'
 
 require 'open3'
 require 'set'
 require 'parse_packwerk'
 
-require "zeitwerk"
-loader = Zeitwerk::Loader.for_gem
+require 'zeitwerk'
+loader = T.unsafe(Zeitwerk::Loader).for_gem
 loader.ignore("#{__dir__}/rubocop")
 loader.setup
 

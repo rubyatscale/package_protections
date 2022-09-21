@@ -112,3 +112,7 @@ module PackageProtections
     RubocopProtectionInterface.bust_rubocop_todo_yml_cache
   end
 end
+
+if defined?(Rubocop)
+  require 'rubocop/cop/package_protections'
+end

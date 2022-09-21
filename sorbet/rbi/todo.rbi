@@ -5,3 +5,6 @@
 module ::Zeitwerk::Loader; end
 module RSpec::Matchers; end
 module RuboCop::RSpec::ExpectOffense; end
+class Hash
+  def to_yaml; end
+end

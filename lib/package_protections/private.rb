@@ -147,16 +147,17 @@ module PackageProtections
 
     sig { params(rule: String).returns(T::Set[String]) }
     def self.exclude_for_rule(rule)
-      excludes = T.let([], T::Array[String])
+      excludes = T.let(Set.new, T::Set[String])
 
       Private.rubocop_todo_ymls.each do |todo_yml|
         config = todo_yml[rule]
-        if config
-          excludes += config['Exclude']
-        end
+        next if config.nil?
+        exclude_list = config['Exclude']
+        next if exclude_list.nil?
+        excludes += exclude_list
       end
 
-      Set.new(excludes.compact)
+      excludes
     end
   end
 

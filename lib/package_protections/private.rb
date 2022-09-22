@@ -117,6 +117,9 @@ module PackageProtections
       @protected_packages_indexed_by_name = nil
       @private_cop_config = nil
       PackageProtections.config.bust_cache!
+      # This comes explicitly after `PackageProtections.config.bust_cache!` because
+      # otherwise `PackageProtections.config` will attempt to reload the client configuratoin.
+      @loaded_client_configuration = false
     end
 
     sig { params(identifier: Identifier).returns(T::Hash[T.untyped, T.untyped]) }
@@ -160,6 +163,17 @@ module PackageProtections
       end
 
       excludes
+    end
+
+    sig { void }
+    def self.load_client_configuration
+      @loaded_client_configuration ||= T.let(false, T.nilable(T::Boolean))
+      if !@loaded_client_configuration
+        @loaded_client_configuration = true
+        client_configuration_ruby_file = Pathname.pwd.join('config/package_protections.rb')
+        client_configuration_require = Pathname.pwd.join('config/package_protections')
+        require client_configuration_require.to_s if client_configuration_ruby_file.exist?
+      end
     end
   end
 

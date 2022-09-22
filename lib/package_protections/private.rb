@@ -152,8 +152,10 @@ module PackageProtections
       Private.rubocop_todo_ymls.each do |todo_yml|
         config = todo_yml[rule]
         next if config.nil?
+
         exclude_list = config['Exclude']
         next if exclude_list.nil?
+
         excludes += exclude_list
       end
 

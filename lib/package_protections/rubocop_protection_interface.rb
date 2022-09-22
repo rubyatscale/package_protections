@@ -71,20 +71,7 @@ module PackageProtections
 
     sig { void }
     def self.bust_rubocop_todo_yml_cache
-      @rubocop_todo_yml = nil
-    end
-
-    sig { returns(T.untyped) }
-    def self.rubocop_todo_yml
-      @rubocop_todo_yml = T.let(@rubocop_todo_yml, T.untyped)
-      @rubocop_todo_yml ||= begin
-        todo_file = Pathname.new('.rubocop_todo.yml')
-        if todo_file.exist?
-          YAML.load_file(todo_file)
-        else
-          {}
-        end
-      end
+      Private.bust_rubocop_todo_yml_cache
     end
 
     sig do
@@ -93,7 +80,7 @@ module PackageProtections
       ).returns(T::Array[Offense])
     end
     def get_offenses_for_existing_violations(protected_packages)
-      exclude_list = exclude_for_rule(cop_name)
+      exclude_list = Private.exclude_for_rule(cop_name)
       offenses = []
 
       protected_packages.each do |package|
@@ -145,14 +132,6 @@ module PackageProtections
           include_paths: include_paths
         )
       ]
-    end
-
-    private
-
-    sig { params(rule: String).returns(T::Set[String]) }
-    def exclude_for_rule(rule)
-      rule_config = RubocopProtectionInterface.rubocop_todo_yml[rule] || {}
-      Set.new(rule_config['Exclude'] || [])
     end
   end
 end

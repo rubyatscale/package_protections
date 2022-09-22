@@ -790,6 +790,24 @@ describe PackageProtections do
             )
           end
 
+          it 'fails if any of this pack\'s files are in a pack-level rubocop TODO' do
+            apples_package_yml_with_namespace_protection_set_to_fail_on_any
+
+            write_file('packs/apples/app/public/tool.rb', '')
+            write_file('packs/apples/.rubocop_todo.yml', <<~YML.strip)
+              PackageProtections/NamespacedUnderPackageName:
+                Exclude:
+                  - packs/apples/app/public/tool.rb
+            YML
+
+            offenses = PackageProtections.get_offenses(packages: get_packages, new_violations: [])
+            expect(offenses).to contain_exactly(1).offense
+            expect(offenses).to include_offense offense(
+              'packs/apples',
+              '`packs/apples/app/public/tool.rb` should be namespaced under the package namespace', 'packs/apples/app/public/tool.rb', 'prevent_this_package_from_creating_other_namespaces'
+            )
+          end
+
           it 'succeeds if another pack\'s file is in the rubocop TODO' do
             apples_package_yml_with_namespace_protection_set_to_fail_on_any
 

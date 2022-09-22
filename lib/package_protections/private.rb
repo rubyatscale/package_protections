@@ -128,6 +128,36 @@ module PackageProtections
         protected_packages.map { |p| [p.name, protection.custom_cop_config(p)] }.to_h
       end
     end
+
+    sig { returns(T::Array[T::Hash[T.untyped, T.untyped]]) }
+    def self.rubocop_todo_ymls
+      @rubocop_todo_ymls = T.let(@rubocop_todo_ymls, T.nilable(T::Array[T::Hash[T.untyped, T.untyped]]))
+      @rubocop_todo_ymls ||= begin
+        todo_files = Pathname.glob('**/.rubocop_todo.yml')
+        todo_files.map do |todo_file|
+          YAML.load_file(todo_file)
+        end
+      end
+    end
+
+    sig { void }
+    def self.bust_rubocop_todo_yml_cache
+      @rubocop_todo_ymls = nil
+    end
+
+    sig { params(rule: String).returns(T::Set[String]) }
+    def self.exclude_for_rule(rule)
+      excludes = T.let([], T::Array[String])
+
+      Private.rubocop_todo_ymls.each do |todo_yml|
+        config = todo_yml[rule]
+        if config
+          excludes += config['Exclude']
+        end
+      end
+
+      Set.new(excludes.compact)
+    end
   end
 
   private_constant :Private

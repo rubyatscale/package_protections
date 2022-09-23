@@ -1330,4 +1330,20 @@ describe PackageProtections do
                                                          })
     end
   end
+
+  describe 'configuration' do
+    context 'app has a user defined configuration' do
+      before do
+        write_file('config/package_protections.rb', <<~CONFIGURATION)
+          PackageProtections.configure do |config|
+            config.globally_permitted_namespaces = ['MyNamespace']
+          end
+        CONFIGURATION
+      end
+
+      it 'properly configures package protections' do
+        expect(PackageProtections.config.globally_permitted_namespaces).to eq(['MyNamespace'])
+      end
+    end
+  end
 end

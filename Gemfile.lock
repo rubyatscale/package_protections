@@ -1,13 +1,12 @@
 PATH
   remote: .
   specs:
-    package_protections (2.1.1)
+    package_protections (2.2.0)
       activesupport
       parse_packwerk
       rubocop
       rubocop-sorbet
       sorbet-runtime
-      zeitwerk
 
 GEM
   remote: https://rubygems.org/
@@ -109,7 +108,6 @@ GEM
     yard-sorbet (0.6.1)
       sorbet-runtime (>= 0.5)
       yard (>= 0.9)
-    zeitwerk (2.6.0)
 
 PLATFORMS
   ruby

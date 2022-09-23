@@ -168,11 +168,11 @@ module PackageProtections
     sig { void }
     def self.load_client_configuration
       @loaded_client_configuration ||= T.let(false, T.nilable(T::Boolean))
-      if !@loaded_client_configuration
-        @loaded_client_configuration = true
-        client_configuration = Pathname.pwd.join('config/package_protections.rb')
-        require client_configuration.to_s if client_configuration.exist?
-      end
+      return if @loaded_client_configuration
+
+      @loaded_client_configuration = true
+      client_configuration = Pathname.pwd.join('config/package_protections.rb')
+      require client_configuration.to_s if client_configuration.exist?
     end
   end
 

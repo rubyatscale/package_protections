@@ -808,6 +808,17 @@ describe PackageProtections do
             )
           end
 
+          it 'does not fail if a .rubocop_todo.yml is in the wrong format' do
+            apples_package_yml_with_namespace_protection_set_to_fail_on_any
+
+            write_file('packs/apples/app/public/tool.rb', '')
+            write_file('packs/apples/.rubocop_todo.yml', <<~YML.strip)
+            YML
+
+            offenses = PackageProtections.get_offenses(packages: get_packages, new_violations: [])
+            expect(offenses).to contain_exactly(0).offense
+          end
+
           it 'succeeds if another pack\'s file is in the rubocop TODO' do
             apples_package_yml_with_namespace_protection_set_to_fail_on_any
 

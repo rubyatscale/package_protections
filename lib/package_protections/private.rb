@@ -153,6 +153,8 @@ module PackageProtections
       excludes = T.let(Set.new, T::Set[String])
 
       Private.rubocop_todo_ymls.each do |todo_yml|
+        next if !todo_yml
+
         config = todo_yml[rule]
         next if config.nil?
 

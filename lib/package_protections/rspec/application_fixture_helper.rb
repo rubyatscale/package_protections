@@ -18,7 +18,8 @@ module ApplicationFixtureHelper
     enforce_privacy: true,
     protections: {},
     global_namespaces: [],
-    visible_to: []
+    visible_to: [],
+    automatic_pack_namespace: false
   )
     defaults = {
       'prevent_this_package_from_violating_its_stated_dependencies' => 'fail_on_new',
@@ -36,6 +37,8 @@ module ApplicationFixtureHelper
     if global_namespaces.any?
       metadata.merge!('global_namespaces' => global_namespaces)
     end
+
+    metadata.merge!('automatic_pack_namespace' => true) if automatic_pack_namespace
 
     package = ParsePackwerk::Package.new(
       name: pack_name,

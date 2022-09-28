@@ -377,4 +377,23 @@ RSpec.describe RuboCop::Cop::PackageProtections::NamespacedUnderPackageName do
       it { expect_no_offenses source, Pathname.pwd.join(write_file('packs/fruits/apples/app/models/concerns/apples.rb')).to_s }
     end
   end
+
+  context 'a pack uses custom zeitwerk namespaces' do
+    before do
+      write_package_yml('packs/apples', automatic_pack_namespace: true)
+    end
+
+    context 'when file establishes different namespace' do
+      let(:source) do
+        <<~RUBY
+          module Apples
+            class Tool
+            end
+          end
+        RUBY
+      end
+
+      it { expect_no_offenses source, Pathname.pwd.join(write_file('packs/apples/app/services/tool.rb')).to_s }
+    end
+  end
 end

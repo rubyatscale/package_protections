@@ -31,6 +31,8 @@ module RuboCop
           relative_filename = relative_filepath.to_s
           package_for_path = ParsePackwerk.package_from_path(relative_filename)
           return if package_for_path.nil?
+          # If a pack is using automatic pack namespaces, this protection is a no-op since zeitwerk will enforce single namespaces in that case.
+          return if package_for_path.metadata['automatic_pack_namespace']
 
           namespace_context = self.class.desired_zeitwerk_api.for_file(relative_filename, package_for_path)
           return if namespace_context.nil?

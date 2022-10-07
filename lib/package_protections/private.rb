@@ -115,21 +115,10 @@ module PackageProtections
     sig { void }
     def self.bust_cache!
       @protected_packages_indexed_by_name = nil
-      @private_cop_config = nil
       PackageProtections.config.bust_cache!
       # This comes explicitly after `PackageProtections.config.bust_cache!` because
       # otherwise `PackageProtections.config` will attempt to reload the client configuratoin.
       @loaded_client_configuration = false
-    end
-
-    sig { params(identifier: Identifier).returns(T::Hash[T.untyped, T.untyped]) }
-    def self.private_cop_config(identifier)
-      @private_cop_config ||= T.let(@private_cop_config, T.nilable(T::Hash[T.untyped, T.untyped]))
-      @private_cop_config ||= begin
-        protected_packages = all_protected_packages
-        protection = T.cast(PackageProtections.with_identifier(identifier), PackageProtections::RubocopProtectionInterface)
-        protected_packages.to_h { |p| [p.name, protection.custom_cop_config(p)] }
-      end
     end
 
     sig { returns(T::Array[T::Hash[T.untyped, T.untyped]]) }

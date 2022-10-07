@@ -118,15 +118,6 @@ module PackageProtections
     Private.rubocop_yml(root_pathname: root_pathname)
   end
 
-  #
-  # Do not use this method -- it's meant to be used by Rubocop cops to get directory-specific
-  # parameters without needing to have directory-specific .rubocop.yml files.
-  #
-  sig { params(identifier: Identifier).returns(T::Hash[T.untyped, T.untyped]) }
-  def self.private_cop_config(identifier)
-    Private.private_cop_config(identifier)
-  end
-
   sig { void }
   def self.bust_cache!
     Private.bust_cache!

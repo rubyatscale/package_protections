@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # typed: strict
+
 module PackageProtections
   module ProtectionInterface
     extend T::Sig

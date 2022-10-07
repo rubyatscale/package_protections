@@ -812,8 +812,7 @@ describe PackageProtections do
             apples_package_yml_with_namespace_protection_set_to_fail_on_any
 
             write_file('packs/apples/app/public/tool.rb', '')
-            write_file('packs/apples/.rubocop_todo.yml', <<~YML.strip)
-            YML
+            write_file('packs/apples/.rubocop_todo.yml', ''.strip)
 
             offenses = PackageProtections.get_offenses(packages: get_packages, new_violations: [])
             expect(offenses).to contain_exactly(0).offense

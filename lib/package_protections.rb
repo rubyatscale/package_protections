@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # typed: strict
+
 require 'sorbet-runtime'
 require 'open3'
 require 'set'
@@ -67,7 +68,7 @@ module PackageProtections
   sig { params(identifier: Identifier).returns(ProtectionInterface) }
   def self.with_identifier(identifier)
     @map ||= T.let(@map, T.nilable(T::Hash[Identifier, ProtectionInterface]))
-    @map ||= all.map { |protection| [protection.identifier, protection] }.to_h
+    @map ||= all.to_h { |protection| [protection.identifier, protection] }
     @map.fetch(identifier)
   end
 

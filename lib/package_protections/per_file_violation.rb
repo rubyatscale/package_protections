@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # typed: strict
+
 module PackageProtections
   # Perhaps this should be in ParsePackwerk. For now, this is here to help us break down violations per file.
   # This is analogous to `Packwerk::ReferenceOffense`

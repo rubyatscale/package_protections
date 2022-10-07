@@ -19,14 +19,14 @@ Gem::Specification.new do |spec|
   end
 
   spec.files = Dir['lib/**/*', 'README.md', 'config/default.yml']
-  spec.required_ruby_version = Gem::Requirement.new('>= 2.5.0')
+  spec.required_ruby_version = Gem::Requirement.new('>= 2.6.0')
 
   spec.add_dependency 'activesupport'
   spec.add_dependency 'parse_packwerk'
   spec.add_dependency 'rubocop'
+  spec.add_dependency 'rubocop-modularization'
   spec.add_dependency 'rubocop-sorbet'
   spec.add_dependency 'sorbet-runtime'
-  spec.add_dependency 'rubocop-modularization'
 
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'

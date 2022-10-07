@@ -8,7 +8,7 @@ require 'set'
 require 'parse_packwerk'
 require 'rubocop'
 require 'rubocop-sorbet'
-require 'rubocop-modularization'
+require 'rubocop-packs'
 
 #
 # Welcome to PackageProtections!

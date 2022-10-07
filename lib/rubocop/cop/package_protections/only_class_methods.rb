@@ -3,7 +3,7 @@
 module RuboCop
   module Cop
     module PackageProtections
-      class OnlyClassMethods < Modularization::ClassMethodsAsPublicApis
+      class OnlyClassMethods < Packs::ClassMethodsAsPublicApis
         extend T::Sig
         include ::PackageProtections::RubocopProtectionInterface
 

@@ -33,6 +33,15 @@ module RuboCop
           ]
         end
 
+        sig do
+          override.returns(T::Hash[T.untyped, T.untyped])
+        end
+        def custom_cop_config
+          {
+            'AcceptableParentClasses' => ::PackageProtections.config.acceptable_parent_classes
+          }
+        end
+
         sig { override.returns(String) }
         def identifier
           IDENTIFIER

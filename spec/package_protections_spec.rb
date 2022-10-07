@@ -1295,7 +1295,18 @@ describe PackageProtections do
           it 'generates the expected rubocop.yml entries' do
             apples_package_yml_with_api_documentation_protection_set_to_fail_never
             cop_config = get_resulting_rubocop[cop_name]
-            expect(cop_config).to eq({ 'Enabled' => false })
+            expect(cop_config).to eq({ 'Enabled' => false, 'AcceptableParentClasses' => [] })
+          end
+
+          context 'acceptable parent classes is configured' do
+            it 'generates the expected rubocop.yml entries' do
+              PackageProtections.configure do |config|
+                config.acceptable_parent_classes = ['Blah']
+              end
+              apples_package_yml_with_api_documentation_protection_set_to_fail_never
+              cop_config = get_resulting_rubocop[cop_name]
+              expect(cop_config).to eq({ 'Enabled' => false, 'AcceptableParentClasses' => ['Blah'] })
+            end
           end
 
           it 'is implemented by Rubocop' do

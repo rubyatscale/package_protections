@@ -57,9 +57,9 @@ module PackageProtections
     # but a default is provided.
     ############################################################################
     sig do
-      params(package: ProtectedPackage).returns(T::Hash[T.untyped, T.untyped])
+      returns(T::Hash[T.untyped, T.untyped])
     end
-    def custom_cop_config(package)
+    def custom_cop_config
       {}
     end
 
@@ -135,7 +135,8 @@ module PackageProtections
         CopConfig.new(
           name: cop_name,
           enabled: include_paths.any?,
-          include_paths: include_paths
+          include_paths: include_paths,
+          metadata: custom_cop_config
         )
       ]
     end

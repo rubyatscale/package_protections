@@ -54,21 +54,14 @@ This protection ensures that all files within `app/public` are typed at level `s
 This helps ensure that your package is only creating one namespace (based on folder hierarchy). This helps organize the public API of your pack into one place.
 This protection only looks at files in `packs/your_pack/app` (it ignores spec files).
 This protection is implemented via Rubocop -- expect to see results for this when running `rubocop` however you normally do. To add to the TODO list, add to `.rubocop_todo.yml`
-Lastly – this protection can be configured by setting `global_namespaces` within the `package.yml`, e.g.:
-```
-enforce_privacy: true
-enforce_dependencies: true
-metadata:
-  protections:
-    # ... nothing changes here
-  global_namespaces:
-    - MyNamespace
-    - MyOtherNamespace
-    - MyThirdNamespace
-    # ... etc.
+Lastly – this protection can be configured by setting `globally_permitted_namespaces`, e.g.:
+```ruby
+PackageProtections.configure do |config|
+  config.globally_permitted_namespaces = ['SomeGlobalNamespace']
+end
 ```
 
-It's encouraged to limit the number of global namespaces your package exposes, and to make sure your global namespaces are as specific to your domain as possible.
+If you've worked through all of the TODOs for this cop and are able to set the value to `fail_on_any`, you can also set `automatic_pack_namespace` which will support your pack having one global namespace without extra subdirectories. That is, instead of `packs/foo/app/services/foo/bar.rb`, you can use `packs/foo/app/services/bar.rb` and still have it define `Foo::Bar`. [See the `stimpack` README.md](https://github.com/rubyatscale/stimpack#readme) for more information.
 
 ### `prevent_other_packages_from_using_this_package_without_explicit_visibility`
 *This is only available if your package has `enforce_privacy` set to `true`!*

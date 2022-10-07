@@ -5,32 +5,26 @@ module PackageProtections
     class Configuration
       extend T::Sig
 
-      sig { params(protections: T::Array[ProtectionInterface]).void }
-      attr_writer :protections
+      sig { returns(T::Array[ProtectionInterface]) }
+      attr_accessor :protections
 
-      sig { params(globally_permitted_namespaces: T::Array[String]).void }
-      attr_writer :globally_permitted_namespaces
+      sig { returns(T::Array[String]) }
+      attr_accessor :globally_permitted_namespaces
+
+      sig { returns(T::Array[String]) }
+      attr_accessor :acceptable_parent_classes
 
       sig { void }
       def initialize
         @protections = T.let(default_protections, T::Array[ProtectionInterface])
         @globally_permitted_namespaces = T.let([], T::Array[String])
+        @acceptable_parent_classes = T.let([], T::Array[String])
       end
-
-      sig { returns(T::Array[ProtectionInterface]) }
-      def protections
-        @protections
-      end
-
-      sig { returns(T::Array[String]) }
-      def globally_permitted_namespaces
-        @globally_permitted_namespaces
-      end
-
       sig { void }
       def bust_cache!
         @protections = default_protections
         @globally_permitted_namespaces = []
+        @acceptable_parent_classes = []
       end
 
       sig { returns(T::Array[ProtectionInterface]) }

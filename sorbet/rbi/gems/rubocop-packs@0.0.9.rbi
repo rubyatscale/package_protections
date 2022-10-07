@@ -16,7 +16,7 @@ class RuboCop::Cop::Packs::ClassMethodsAsPublicApis < ::RuboCop::Cop::Base
   def support_autocorrect?; end
 end
 
-class RuboCop::Cop::Packs::NamespacedUnderPackageName < ::RuboCop::Cop::Base
+class RuboCop::Cop::Packs::NamespaceConvention < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::RangeHelp
 
   sig { void }
@@ -27,15 +27,15 @@ class RuboCop::Cop::Packs::NamespacedUnderPackageName < ::RuboCop::Cop::Base
 
   private
 
-  sig { returns(RuboCop::Cop::Packs::NamespacedUnderPackageName::DesiredZeitwerkApi) }
+  sig { returns(RuboCop::Cop::Packs::NamespaceConvention::DesiredZeitwerkApi) }
   def desired_zeitwerk_api; end
 
   sig { returns(T::Hash[String, String]) }
   def namespaces_to_packs; end
 end
 
-class RuboCop::Cop::Packs::NamespacedUnderPackageName::DesiredZeitwerkApi
-  sig { params(relative_filename: String, package_for_path: ParsePackwerk::Package).returns(T.nilable(RuboCop::Cop::Packs::NamespacedUnderPackageName::DesiredZeitwerkApi::NamespaceContext)) }
+class RuboCop::Cop::Packs::NamespaceConvention::DesiredZeitwerkApi
+  sig { params(relative_filename: String, package_for_path: ParsePackwerk::Package).returns(T.nilable(RuboCop::Cop::Packs::NamespaceConvention::DesiredZeitwerkApi::NamespaceContext)) }
   def for_file(relative_filename, package_for_path); end
 
   sig { params(pack: ParsePackwerk::Package).returns(String) }
@@ -53,7 +53,8 @@ class RuboCop::Cop::Packs::NamespacedUnderPackageName::DesiredZeitwerkApi
   def root_pathname; end
 end
 
-class RuboCop::Cop::Packs::NamespacedUnderPackageName::DesiredZeitwerkApi::NamespaceContext < ::T::Struct
+class RuboCop::Cop::Packs::NamespaceConvention::DesiredZeitwerkApi::NamespaceContext < ::T::Struct
+  const :current_fully_qualified_constant, String
   const :current_namespace, String
   const :expected_filepath, String
   const :expected_namespace, String

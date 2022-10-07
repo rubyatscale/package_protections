@@ -6,7 +6,7 @@ require 'active_support/core_ext/string/inflections'
 module RuboCop
   module Cop
     module PackageProtections
-      class NamespacedUnderPackageName < Packs::NamespacedUnderPackageName
+      class NamespacedUnderPackageName < Packs::NamespaceConvention
         extend T::Sig
         include ::PackageProtections::RubocopProtectionInterface
 

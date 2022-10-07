@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    package_protections (2.3.0)
+    package_protections (2.3.1)
       activesupport
       parse_packwerk
       rubocop

@@ -59,6 +59,10 @@ class RuboCop::Cop::Modularization::NamespacedUnderPackageName::DesiredZeitwerkA
   end
 end
 
+class RuboCop::Cop::Modularization::RequireDocumentedPublicApis < ::RuboCop::Cop::Style::DocumentationMethod
+  def check(node); end
+end
+
 class RuboCop::Cop::Modularization::TypedPublicApi < ::RuboCop::Cop::Sorbet::StrictSigil; end
 module RuboCop::Modularization; end
 RuboCop::Modularization::CONFIG = T.let(T.unsafe(nil), Hash)

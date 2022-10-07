@@ -25,7 +25,7 @@ module ApplicationFixtureHelper
       'prevent_this_package_from_exposing_an_untyped_api' => 'fail_on_new',
       'prevent_this_package_from_creating_other_namespaces' => 'fail_on_new',
       'prevent_other_packages_from_using_this_package_without_explicit_visibility' => 'fail_never',
-      'prevent_this_package_from_exposing_instance_method_public_apis' => 'fail_never',
+      'prevent_this_package_from_exposing_instance_method_public_apis' => 'fail_never'
     }
     protections_with_defaults = defaults.merge(protections)
     metadata = { 'protections' => protections_with_defaults }

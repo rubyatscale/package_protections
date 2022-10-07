@@ -29,7 +29,7 @@ module RuboCop
         sig { override.returns(T::Array[String]) }
         def included_globs_for_pack
           [
-            'app/public/**/*',
+            'app/public/**/*'
           ]
         end
 

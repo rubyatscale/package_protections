@@ -1287,7 +1287,7 @@ describe PackageProtections do
             write_package_yml(
               'packs/apples',
               protections: {
-                'prevent_this_package_from_exposing_instance_method_public_apis' => 'fail_never',
+                'prevent_this_package_from_exposing_instance_method_public_apis' => 'fail_never'
               }
             )
           end
@@ -1326,7 +1326,7 @@ describe PackageProtections do
             write_package_yml(
               'packs/apples',
               protections: {
-                'prevent_this_package_from_exposing_instance_method_public_apis' => 'fail_on_new',
+                'prevent_this_package_from_exposing_instance_method_public_apis' => 'fail_on_new'
               }
             )
           end
@@ -1355,6 +1355,184 @@ describe PackageProtections do
             write_file('packs/apples/README.md')
             offenses = PackageProtections.get_offenses(packages: ParsePackwerk.all, new_violations: [])
             expect(offenses).to be_empty
+          end
+        end
+      end
+
+      describe 'prevent_this_package_from_exposing_undocumented_public_apis' do
+        it 'has a helpful humanized name' do
+          expected_humanized_message = 'Documented Public APIs'
+          actual_message = PackageProtections.with_identifier('prevent_this_package_from_exposing_undocumented_public_apis').humanized_protection_name
+          expect(actual_message).to eq expected_humanized_message
+        end
+
+        it 'has a helpful humanized description' do
+          expected_humanized_message = <<~MESSAGE
+            All public API must have a documentation comment (between the signature and method).
+            This is failing because these files are in `.rubocop_todo.yml` under `PackageProtections/RequireDocumentedPublicApis`.
+            If you want to be able to ignore these files, you'll need to open the file's package's `package.yml` file and
+            change `prevent_this_package_from_exposing_undocumented_public_apis` to `fail_on_new`
+          MESSAGE
+
+          actual_message = PackageProtections.with_identifier('prevent_this_package_from_exposing_undocumented_public_apis').humanized_protection_description
+          expect(actual_message).to eq expected_humanized_message
+        end
+
+        context 'set to fail_never' do
+          let(:apples_package_yml_with_api_documentation_protection_set_to_fail_never) do
+            # TODO: Refactor Package Protections to not need to do this, see https://github.com/Gusto/zenpayroll/issues/141570
+            write_package_yml(
+              'packs/apples',
+              protections: {
+                'prevent_this_package_from_exposing_undocumented_public_apis' => 'fail_never',
+                'prevent_this_package_from_exposing_instance_method_public_apis' => 'fail_never'
+              }
+            )
+          end
+
+          it 'generates the expected rubocop.yml entries' do
+            apples_package_yml_with_api_documentation_protection_set_to_fail_never
+            cop_config = get_resulting_rubocop['PackageProtections/RequireDocumentedPublicApis']
+            expect(cop_config).to eq({ 'Enabled' => false })
+          end
+
+          it 'is implemented by Rubocop' do
+            apples_package_yml_with_api_documentation_protection_set_to_fail_never
+
+            offenses = PackageProtections.get_offenses(packages: ParsePackwerk.all, new_violations: [])
+            expect(offenses).to be_empty
+          end
+
+          it 'succeeds even if there is a public API file in the rubocop TODO list' do
+            apples_package_yml_with_api_documentation_protection_set_to_fail_never
+
+            write_file('packs/apples/app/public/tool.rb', '')
+            write_file('.rubocop_todo.yml', <<~YML.strip)
+              PackageProtections/RequireDocumentedPublicApi:
+                Exclude:
+                  - packs/apples/app/public/tool.rb
+            YML
+
+            offenses = PackageProtections.get_offenses(packages: ParsePackwerk.all, new_violations: [])
+            expect(offenses).to contain_exactly(0).offense
+          end
+        end
+
+        context 'set to fail_on_new' do
+          let(:apples_package_yml_with_api_documentation_protection_set_to_fail_on_new) do
+            # TODO: Refactor Package Protections to not need to do this, see https://github.com/Gusto/zenpayroll/issues/141570
+            write_package_yml(
+              'packs/apples',
+              protections: {
+                'prevent_this_package_from_exposing_undocumented_public_apis' => 'fail_on_new',
+                'prevent_this_package_from_exposing_instance_method_public_apis' => 'fail_never'
+              }
+            )
+          end
+
+          it 'generates the expected rubocop.yml entries' do
+            apples_package_yml_with_api_documentation_protection_set_to_fail_on_new
+            write_file('packs/apples/README.md')
+            cop_config = get_resulting_rubocop['PackageProtections/RequireDocumentedPublicApis']
+            expect(cop_config['Exclude']).to eq(nil)
+            expect(cop_config['Include']).to eq(['packs/apples/app/public/**/*'])
+            expect(cop_config['Enabled']).to eq(true)
+          end
+
+          context 'package has no README.md' do
+            it 'generates the expected rubocop.yml entries' do
+              apples_package_yml_with_api_documentation_protection_set_to_fail_on_new
+              expect { get_resulting_rubocop['PackageProtections/RequireDocumentedPublicApis'] }.to raise_error do |e|
+                expect(e).to be_a PackageProtections::IncorrectPublicApiUsageError
+                expect(e.message).to eq 'prevent_this_package_from_exposing_undocumented_public_apis protection does not have the valid preconditions. This package must have a readme at packs/apples/README.md to use this protection. See https://github.com/rubyatscale/package_protections#readme for more info'
+              end
+            end
+          end
+
+          it 'is implemented by Rubocop' do
+            apples_package_yml_with_api_documentation_protection_set_to_fail_on_new
+            write_file('packs/apples/README.md')
+            offenses = PackageProtections.get_offenses(packages: ParsePackwerk.all, new_violations: [])
+            expect(offenses).to be_empty
+          end
+        end
+
+        context 'set to fail_on_any' do
+          let(:apples_package_yml_with_api_documentation_protection_set_to_fail_on_any) do
+            # TODO: Refactor Package Protections to not need to do this, see https://github.com/Gusto/zenpayroll/issues/141570
+            write_package_yml(
+              'packs/apples',
+              protections: {
+                'prevent_this_package_from_exposing_undocumented_public_apis' => 'fail_on_any',
+                'prevent_this_package_from_exposing_instance_method_public_apis' => 'fail_never'
+              }
+            )
+          end
+
+          it 'generates the expected rubocop.yml entries' do
+            apples_package_yml_with_api_documentation_protection_set_to_fail_on_any
+            write_file('packs/apples/README.md')
+            cop_config = get_resulting_rubocop['PackageProtections/RequireDocumentedPublicApis']
+            expect(cop_config['Exclude']).to eq(nil)
+            expect(cop_config['Include']).to eq(['packs/apples/app/public/**/*'])
+            expect(cop_config['Enabled']).to eq(true)
+          end
+
+          it 'succeeds if there are no entries for public API files in the rubocop TODO list' do
+            apples_package_yml_with_api_documentation_protection_set_to_fail_on_any
+            write_file('packs/apples/app/public/tool.rb', '')
+            write_file('packs/apples/README.md')
+            offenses = PackageProtections.get_offenses(packages: ParsePackwerk.all, new_violations: [])
+            expect(offenses).to contain_exactly(0).offenses
+          end
+
+          it 'succeeds when there are files from private implementation in the rubocop TODO list' do
+            apples_package_yml_with_api_documentation_protection_set_to_fail_on_any
+            write_file('packs/apples/README.md')
+            write_file('packs/apples/app/services/tool.rb', '')
+            write_file('.rubocop_todo.yml', <<~YML.strip)
+              PackageProtections/RequireDocumentedPublicApi:
+                Exclude:
+                  - packs/apples/app/services/tool.rb
+            YML
+
+            offenses = PackageProtections.get_offenses(packages: ParsePackwerk.all, new_violations: [])
+            expect(offenses).to contain_exactly(0).offense
+          end
+
+          it 'fails if there is a public API file in the rubocop TODO list' do
+            apples_package_yml_with_api_documentation_protection_set_to_fail_on_any
+            write_file('packs/apples/README.md')
+            write_file('packs/apples/app/public/tool.rb', '')
+
+            write_file('.rubocop_todo.yml', <<~YML.strip)
+              PackageProtections/RequireDocumentedPublicApis:
+                Exclude:
+                  - packs/apples/app/public/tool.rb
+            YML
+
+            offenses = PackageProtections.get_offenses(packages: ParsePackwerk.all, new_violations: [])
+            expect(offenses).to contain_exactly(1).offense
+            expect(offenses).to include_offense offense(
+              'packs/apples',
+              '`packs/apples/app/public/tool.rb` must contain documentation on every method (between signature and method)', 'packs/apples/app/public/tool.rb', 'prevent_this_package_from_exposing_undocumented_public_apis'
+            )
+          end
+
+          it 'succeeds if there is a different pack\'s public API file in the rubocop TODO list' do
+            apples_package_yml_with_api_documentation_protection_set_to_fail_on_any
+
+            write_file('packs/apples/app/public/tool.rb', '')
+            write_file('.rubocop_todo.yml', <<~YML.strip)
+              PackageProtections/RequireDocumentedPublicApi:
+                Exclude:
+                  - packs/other_pack/app/public/tool.rb
+            YML
+
+            write_file('packs/apples/README.md')
+
+            offenses = PackageProtections.get_offenses(packages: ParsePackwerk.all, new_violations: [])
+            expect(offenses).to contain_exactly(0).offenses
           end
         end
       end

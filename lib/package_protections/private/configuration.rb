@@ -36,6 +36,7 @@ module PackageProtections
           RuboCop::Cop::PackageProtections::NamespacedUnderPackageName.new,
           Private::VisibilityProtection.new,
           RuboCop::Cop::PackageProtections::OnlyClassMethods.new,
+          RuboCop::Cop::PackageProtections::RequireDocumentedPublicApis.new
         ]
       end
     end

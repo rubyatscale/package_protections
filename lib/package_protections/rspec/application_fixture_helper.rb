@@ -17,7 +17,6 @@ module ApplicationFixtureHelper
     enforce_dependencies: true,
     enforce_privacy: true,
     protections: {},
-    global_namespaces: [],
     visible_to: []
   )
     defaults = {
@@ -31,10 +30,6 @@ module ApplicationFixtureHelper
     metadata = { 'protections' => protections_with_defaults }
     if visible_to.any?
       metadata.merge!('visible_to' => visible_to)
-    end
-
-    if global_namespaces.any?
-      metadata.merge!('global_namespaces' => global_namespaces)
     end
 
     package = ParsePackwerk::Package.new(

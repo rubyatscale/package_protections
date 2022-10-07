@@ -11,7 +11,13 @@ describe PackageProtections do
 
     PackageProtections.bust_cache!
     allow(Bundler).to receive(:root).and_return(Pathname.new('.'))
+
+    PackageProtections.configure do |config|
+      config.globally_permitted_namespaces = globally_permitted_namespaces
+    end
   end
+
+  let(:globally_permitted_namespaces) { [] }
 
   def get_packages
     ParsePackwerk.bust_cache!
@@ -646,29 +652,16 @@ describe PackageProtections do
         end
 
         context 'set to fail_never' do
-          let(:apples_global_namespaces) { [] }
+          let(:globally_permitted_namespaces) { [] }
 
           let(:apples_package_yml_with_namespace_protection_set_to_fail_never) do
-            write_package_yml('packs/apples', global_namespaces: apples_global_namespaces, protections: { 'prevent_this_package_from_creating_other_namespaces' => 'fail_never' })
-          end
-
-          context 'global_namespaces to metadata is set but protection is fail_on_never' do
-            let(:apples_global_namespaces) { ['AppleTrees'] }
-
-            it 'blows up due to invalid precondition' do
-              apples_package_yml_with_namespace_protection_set_to_fail_never
-              expect { PackageProtections.get_offenses(packages: get_packages, new_violations: []) }.to raise_error do |e|
-                expect(e).to be_a PackageProtections::IncorrectPublicApiUsageError
-                error_message = 'Invalid configuration for package `packs/apples`. `prevent_this_package_from_creating_other_namespaces` must be turned on to use `global_namespaces` configuration.'
-                expect(e.message).to include error_message
-              end
-            end
+            write_package_yml('packs/apples', protections: { 'prevent_this_package_from_creating_other_namespaces' => 'fail_never' })
           end
 
           it 'generates the expected rubocop.yml entries' do
             apples_package_yml_with_namespace_protection_set_to_fail_never
             cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
-            expect(cop_config).to eq({ 'Enabled' => true, 'Include' => ['packs/apples/app/**/*', 'packs/apples/lib/**/*'] })
+            expect(cop_config).to eq({ 'Enabled' => false, 'GloballyPermittedNamespaces' => [], 'IncludePacks' => [] })
           end
 
           it 'is implemented by Rubocop' do
@@ -694,33 +687,36 @@ describe PackageProtections do
         end
 
         context 'set to fail_on_new' do
-          let(:apples_global_namespaces) { [] }
+          let(:globally_permitted_namespaces) { [] }
 
           let(:apples_package_yml_with_namespace_protection_set_to_fail_on_new) do
-            write_package_yml('packs/apples', global_namespaces: apples_global_namespaces, protections: { 'prevent_this_package_from_creating_other_namespaces' => 'fail_on_new' })
+            write_package_yml('packs/apples', protections: { 'prevent_this_package_from_creating_other_namespaces' => 'fail_on_new' })
           end
 
           context 'global_namespaces is unset' do
-            let(:apples_global_namespaces) { [] }
+            let(:globally_permitted_namespaces) { [] }
 
             it 'generates the expected rubocop.yml entries' do
               apples_package_yml_with_namespace_protection_set_to_fail_on_new
               cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
               expect(cop_config['Exclude']).to eq(nil)
-              expect(cop_config['Include']).to eq(['packs/apples/app/**/*', 'packs/apples/lib/**/*'])
-              expect(cop_config['Enabled']).to eq(true)
+              expect(cop_config['Include']).to eq(nil)
+              expect(cop_config['IncludePacks']).to eq(['packs/apples'])
+              expect(cop_config['GloballyPermittedNamespaces']).to eq([])
             end
           end
 
           context 'global_namespaces is set' do
-            let(:apples_global_namespaces) { %w[AppleTrees Ciders Apples] }
+            let(:globally_permitted_namespaces) { %w[AppleTrees Ciders Apples] }
 
             it 'generates the expected rubocop.yml entries' do
               apples_package_yml_with_namespace_protection_set_to_fail_on_new
               cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
               expect(cop_config['Exclude']).to eq(nil)
-              expect(cop_config['Include']).to eq(['packs/apples/app/**/*', 'packs/apples/lib/**/*'])
+              expect(cop_config['Include']).to eq(nil)
+              expect(cop_config['IncludePacks']).to eq(['packs/apples'])
               expect(cop_config['Enabled']).to eq(true)
+              expect(cop_config['GloballyPermittedNamespaces']).to eq(%w[AppleTrees Ciders Apples])
             end
           end
 
@@ -732,30 +728,34 @@ describe PackageProtections do
 
           context 'the package is nested' do
             let(:apples_package_yml_with_namespace_protection_set_to_fail_on_new) do
-              write_package_yml('packs/apples/subpack', global_namespaces: apples_global_namespaces, protections: { 'prevent_this_package_from_creating_other_namespaces' => 'fail_on_new' })
+              write_package_yml('packs/apples/subpack', protections: { 'prevent_this_package_from_creating_other_namespaces' => 'fail_on_new' })
             end
 
             context 'global_namespaces is unset' do
-              let(:apples_global_namespaces) { [] }
+              let(:globally_permitted_namespaces) { [] }
 
               it 'generates the expected rubocop.yml entries' do
                 apples_package_yml_with_namespace_protection_set_to_fail_on_new
                 cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
                 expect(cop_config['Exclude']).to eq(nil)
-                expect(cop_config['Include']).to eq(['packs/apples/subpack/app/**/*', 'packs/apples/subpack/lib/**/*'])
                 expect(cop_config['Enabled']).to eq(true)
+                expect(cop_config['Include']).to eq(nil)
+                expect(cop_config['IncludePacks']).to eq(['packs/apples/subpack'])
+                expect(cop_config['GloballyPermittedNamespaces']).to eq([])
               end
             end
 
             context 'global_namespaces is set' do
-              let(:apples_global_namespaces) { %w[AppleTrees Ciders Apples] }
+              let(:globally_permitted_namespaces) { %w[AppleTrees Ciders Apples] }
 
               it 'generates the expected rubocop.yml entries' do
                 apples_package_yml_with_namespace_protection_set_to_fail_on_new
                 cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
                 expect(cop_config['Exclude']).to eq(nil)
-                expect(cop_config['Include']).to eq(['packs/apples/subpack/app/**/*', 'packs/apples/subpack/lib/**/*'])
                 expect(cop_config['Enabled']).to eq(true)
+                expect(cop_config['Include']).to eq(nil)
+                expect(cop_config['IncludePacks']).to eq(['packs/apples/subpack'])
+                expect(cop_config['GloballyPermittedNamespaces']).to eq(%w[AppleTrees Ciders Apples])
               end
             end
 
@@ -812,8 +812,7 @@ describe PackageProtections do
             apples_package_yml_with_namespace_protection_set_to_fail_on_any
 
             write_file('packs/apples/app/public/tool.rb', '')
-            write_file('packs/apples/.rubocop_todo.yml', <<~YML.strip)
-            YML
+            write_file('packs/apples/.rubocop_todo.yml', ''.strip)
 
             offenses = PackageProtections.get_offenses(packages: get_packages, new_violations: [])
             expect(offenses).to contain_exactly(0).offense
@@ -1344,13 +1343,7 @@ describe PackageProtections do
 
   describe 'configuration' do
     context 'app has a user defined configuration' do
-      before do
-        write_file('config/package_protections.rb', <<~CONFIGURATION)
-          PackageProtections.configure do |config|
-            config.globally_permitted_namespaces = ['MyNamespace']
-          end
-        CONFIGURATION
-      end
+      let(:globally_permitted_namespaces) { ['MyNamespace'] }
 
       it 'properly configures package protections' do
         expect(PackageProtections.config.globally_permitted_namespaces).to eq(['MyNamespace'])

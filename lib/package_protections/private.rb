@@ -128,7 +128,7 @@ module PackageProtections
       @private_cop_config ||= begin
         protected_packages = all_protected_packages
         protection = T.cast(PackageProtections.with_identifier(identifier), PackageProtections::RubocopProtectionInterface)
-        protected_packages.map { |p| [p.name, protection.custom_cop_config(p)] }.to_h
+        protected_packages.to_h { |p| [p.name, protection.custom_cop_config(p)] }
       end
     end
 

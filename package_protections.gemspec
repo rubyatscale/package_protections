@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = 'package_protections'
-  spec.version       = '2.2.1'
+  spec.version       = '2.3.0'
   spec.authors       = ['Gusto Engineers']
   spec.email         = ['stephan.hagemann@gusto.com']
   spec.summary       = 'Package protections for Rails apps'
@@ -19,11 +19,12 @@ Gem::Specification.new do |spec|
   end
 
   spec.files = Dir['lib/**/*', 'README.md', 'config/default.yml']
-  spec.required_ruby_version = Gem::Requirement.new('>= 2.5.0')
+  spec.required_ruby_version = Gem::Requirement.new('>= 2.6.0')
 
   spec.add_dependency 'activesupport'
   spec.add_dependency 'parse_packwerk'
   spec.add_dependency 'rubocop'
+  spec.add_dependency 'rubocop-modularization'
   spec.add_dependency 'rubocop-sorbet'
   spec.add_dependency 'sorbet-runtime'
 

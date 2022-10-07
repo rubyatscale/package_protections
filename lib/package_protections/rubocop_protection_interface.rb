@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # typed: strict
+
 module PackageProtections
   module RubocopProtectionInterface
     class CopConfig < T::Struct
@@ -9,6 +10,7 @@ module PackageProtections
       const :enabled, T::Boolean, default: true
       const :include_paths, T::Array[String], default: []
       const :exclude_paths, T::Array[String], default: []
+      const :metadata, T.untyped, default: {}
 
       sig { returns(String) }
       def to_rubocop_yml_compatible_format
@@ -20,6 +22,10 @@ module PackageProtections
 
         if exclude_paths.any?
           cop_config['Exclude'] = exclude_paths
+        end
+
+        if metadata.any?
+          cop_config.merge!(metadata)
         end
 
         { name => cop_config }.to_yaml.gsub("---\n", '')

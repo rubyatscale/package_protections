@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # typed: strict
+
 module PackageProtections
   class ProtectedPackage < T::Struct
     extend T::Sig

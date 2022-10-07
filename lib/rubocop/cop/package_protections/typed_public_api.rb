@@ -15,7 +15,7 @@ module RuboCop
       #
       # We can apply this same pattern if we want to use other cops in the context of package protections and prevent clashing.
       #
-      class TypedPublicApi < Modularization::TypedPublicApi
+      class TypedPublicApi < Packs::TypedPublicApi
         extend T::Sig
 
         include ::PackageProtections::ProtectionInterface

@@ -3,7 +3,7 @@
 module RuboCop
   module Cop
     module PackageProtections
-      class RequireDocumentedPublicApis < Modularization::RequireDocumentedPublicApis
+      class RequireDocumentedPublicApis < Packs::RequireDocumentedPublicApis
         extend T::Sig
         include ::PackageProtections::RubocopProtectionInterface
 

@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activesupport'
   spec.add_dependency 'parse_packwerk'
   spec.add_dependency 'rubocop'
-  spec.add_dependency 'rubocop-modularization'
+  spec.add_dependency 'rubocop-packs'
   spec.add_dependency 'rubocop-sorbet'
   spec.add_dependency 'sorbet-runtime'
 

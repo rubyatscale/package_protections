@@ -40,6 +40,8 @@ module PackageProtections
   # Implementation of rubocop-based protections
   require 'rubocop/cop/package_protections/namespaced_under_package_name'
   require 'rubocop/cop/package_protections/typed_public_api'
+  require 'rubocop/cop/package_protections/only_class_methods'
+  require 'rubocop/cop/package_protections/require_documented_public_apis'
 
   class << self
     extend T::Sig

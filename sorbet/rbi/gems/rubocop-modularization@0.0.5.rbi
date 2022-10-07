@@ -8,16 +8,26 @@ module RuboCop; end
 module RuboCop::Cop; end
 module RuboCop::Cop::Modularization; end
 
+class RuboCop::Cop::Modularization::ClassMethodsAsPublicApis < ::RuboCop::Cop::Base
+  def on_def(node); end
+end
+
 class RuboCop::Cop::Modularization::NamespacedUnderPackageName < ::RuboCop::Cop::Base
   include ::RuboCop::Cop::RangeHelp
 
   sig { void }
   def on_new_investigation; end
 
-  class << self
-    sig { returns(RuboCop::Cop::Modularization::NamespacedUnderPackageName::DesiredZeitwerkApi) }
-    def desired_zeitwerk_api; end
-  end
+  sig { returns(T::Boolean) }
+  def support_autocorrect?; end
+
+  private
+
+  sig { returns(RuboCop::Cop::Modularization::NamespacedUnderPackageName::DesiredZeitwerkApi) }
+  def desired_zeitwerk_api; end
+
+  sig { returns(T::Hash[String, String]) }
+  def namespaces_to_packs; end
 end
 
 class RuboCop::Cop::Modularization::NamespacedUnderPackageName::DesiredZeitwerkApi
@@ -49,52 +59,22 @@ class RuboCop::Cop::Modularization::NamespacedUnderPackageName::DesiredZeitwerkA
   end
 end
 
-class RuboCop::Cop::Modularization::TypedPublicApi < ::RuboCop::Cop::Sorbet::StrictSigil; end
-
-module RuboCop::Modularization
-  class << self
-    sig { void }
-    def bust_cache!; end
-
-    sig { returns(RuboCop::Modularization::Private::Configuration) }
-    def config; end
-
-    sig { params(blk: T.proc.params(arg0: RuboCop::Modularization::Private::Configuration).void).void }
-    def configure(&blk); end
-  end
+class RuboCop::Cop::Modularization::RequireDocumentedPublicApis < ::RuboCop::Cop::Style::DocumentationMethod
+  def check(node); end
 end
 
+class RuboCop::Cop::Modularization::TypedPublicApi < ::RuboCop::Cop::Sorbet::StrictSigil; end
+module RuboCop::Modularization; end
+RuboCop::Modularization::CONFIG = T.let(T.unsafe(nil), Hash)
 RuboCop::Modularization::CONFIG_DEFAULT = T.let(T.unsafe(nil), Pathname)
 class RuboCop::Modularization::Error < ::StandardError; end
 
 module RuboCop::Modularization::Inject
   class << self
+    sig { void }
     def defaults!; end
   end
 end
 
 RuboCop::Modularization::PROJECT_ROOT = T.let(T.unsafe(nil), Pathname)
-
-module RuboCop::Modularization::Private
-  class << self
-    sig { void }
-    def bust_cache!; end
-
-    sig { void }
-    def load_client_configuration; end
-  end
-end
-
-class RuboCop::Modularization::Private::Configuration
-  sig { void }
-  def initialize; end
-
-  sig { void }
-  def bust_cache!; end
-
-  sig { returns(T::Array[String]) }
-  def globally_permitted_namespaces; end
-
-  sig { params(globally_permitted_namespaces: T::Array[String]).void }
-  def globally_permitted_namespaces=(globally_permitted_namespaces); end
-end
+module RuboCop::Modularization::Private; end

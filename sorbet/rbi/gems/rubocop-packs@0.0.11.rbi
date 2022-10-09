@@ -73,7 +73,32 @@ class RuboCop::Cop::Packs::RequireDocumentedPublicApis < ::RuboCop::Cop::Style::
 end
 
 class RuboCop::Cop::Packs::TypedPublicApi < ::RuboCop::Cop::Sorbet::StrictSigil; end
-module RuboCop::Packs; end
+
+module RuboCop::Packs
+  class << self
+    sig { params(packs: T::Array[ParsePackwerk::Package]).void }
+    def auto_generate_rubocop_todo(packs:); end
+
+    sig { void }
+    def bust_cache!; end
+
+    sig { returns(RuboCop::Packs::Private::Configuration) }
+    def config; end
+
+    sig { params(blk: T.proc.params(arg0: RuboCop::Packs::Private::Configuration).void).void }
+    def configure(&blk); end
+
+    sig { params(rule: String).returns(T::Set[String]) }
+    def exclude_for_rule(rule); end
+
+    sig { params(root_pathname: String).returns(String) }
+    def pack_based_rubocop_todos(root_pathname: T.unsafe(nil)); end
+
+    sig { returns(T::Array[String]) }
+    def validate; end
+  end
+end
+
 RuboCop::Packs::CONFIG = T.let(T.unsafe(nil), Hash)
 RuboCop::Packs::CONFIG_DEFAULT = T.let(T.unsafe(nil), Pathname)
 class RuboCop::Packs::Error < ::StandardError; end
@@ -86,4 +111,29 @@ module RuboCop::Packs::Inject
 end
 
 RuboCop::Packs::PROJECT_ROOT = T.let(T.unsafe(nil), Pathname)
-module RuboCop::Packs::Private; end
+
+module RuboCop::Packs::Private
+  class << self
+    sig { void }
+    def bust_cache!; end
+
+    sig { void }
+    def load_client_configuration; end
+
+    sig { returns(T::Array[T::Hash[T.untyped, T.untyped]]) }
+    def rubocop_todo_ymls; end
+  end
+end
+
+class RuboCop::Packs::Private::Configuration
+  sig { void }
+  def initialize; end
+
+  sig { void }
+  def bust_cache!; end
+
+  sig { returns(T::Array[String]) }
+  def permitted_pack_level_cops; end
+
+  def permitted_pack_level_cops=(_arg0); end
+end

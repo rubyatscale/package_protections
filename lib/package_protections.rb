@@ -121,6 +121,6 @@ module PackageProtections
   sig { void }
   def self.bust_cache!
     Private.bust_cache!
-    RubocopProtectionInterface.bust_rubocop_todo_yml_cache
+    RuboCop::Packs.bust_cache!
   end
 end

@@ -75,18 +75,13 @@ module PackageProtections
       []
     end
 
-    sig { void }
-    def self.bust_rubocop_todo_yml_cache
-      Private.bust_rubocop_todo_yml_cache
-    end
-
     sig do
       override.params(
         protected_packages: T::Array[ProtectedPackage]
       ).returns(T::Array[Offense])
     end
     def get_offenses_for_existing_violations(protected_packages)
-      exclude_list = Private.exclude_for_rule(cop_name)
+      exclude_list = RuboCop::Packs.exclude_for_rule(cop_name)
       offenses = []
 
       protected_packages.each do |package|

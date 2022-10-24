@@ -109,9 +109,9 @@ module PackageProtections
 
       # Validate that all protections requiring configuration have explicit configuration
       unspecified_protections = valid_identifiers - metadata.keys
-      protections_requiring_explicit_configuration = unspecified_protections.select do |protection_key|
+      protections_requiring_explicit_configuration = unspecified_protections.reject do |protection_key|
         protection = PackageProtections.with_identifier(protection_key)
-        !protection.default_behavior.fail_never?
+        protection.default_behavior.fail_never?
       end
 
       protections_requiring_explicit_configuration.each do |protection_identifier|

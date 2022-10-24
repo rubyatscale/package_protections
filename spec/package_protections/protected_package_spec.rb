@@ -15,11 +15,11 @@ RSpec.describe PackageProtections::ProtectedPackage do
       YML
 
       expect(PackageProtections.validate!).to eq([
-        "All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_violating_its_stated_dependencies for package ..",
-        "All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_other_packages_from_using_this_packages_internals for package ..",
-        "All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_exposing_an_untyped_api for package ..",
-        "All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_creating_other_namespaces for package .."
-      ])
+                                                   'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_violating_its_stated_dependencies for package ..',
+                                                   'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_other_packages_from_using_this_packages_internals for package ..',
+                                                   'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_exposing_an_untyped_api for package ..',
+                                                   'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_creating_other_namespaces for package ..'
+                                                 ])
     end
 
     context 'empty metadata->protections' do
@@ -30,11 +30,11 @@ RSpec.describe PackageProtections::ProtectedPackage do
         YML
 
         expect(PackageProtections.validate!).to eq([
-          "All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_violating_its_stated_dependencies for package ..",
-          "All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_other_packages_from_using_this_packages_internals for package ..",
-          "All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_exposing_an_untyped_api for package ..",
-          "All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_creating_other_namespaces for package .."
-        ])
+                                                     'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_violating_its_stated_dependencies for package ..',
+                                                     'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_other_packages_from_using_this_packages_internals for package ..',
+                                                     'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_exposing_an_untyped_api for package ..',
+                                                     'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_creating_other_namespaces for package ..'
+                                                   ])
       end
     end
 
@@ -45,7 +45,7 @@ RSpec.describe PackageProtections::ProtectedPackage do
             someprotection: true
       YML
 
-      expect(PackageProtections.validate!).to include "Invalid configuration for package `.`. The metadata keys [\"someprotection\"] are not a valid behavior under the `protection` metadata namespace. Valid keys are [\"prevent_this_package_from_violating_its_stated_dependencies\", \"prevent_other_packages_from_using_this_packages_internals\", \"prevent_this_package_from_exposing_an_untyped_api\", \"prevent_this_package_from_creating_other_namespaces\", \"prevent_other_packages_from_using_this_package_without_explicit_visibility\", \"prevent_this_package_from_exposing_instance_method_public_apis\", \"prevent_this_package_from_exposing_undocumented_public_apis\"]. See https://github.com/rubyatscale/package_protections#readme for more info"
+      expect(PackageProtections.validate!).to include 'Invalid configuration for package `.`. The metadata keys ["someprotection"] are not a valid behavior under the `protection` metadata namespace. Valid keys are ["prevent_this_package_from_violating_its_stated_dependencies", "prevent_other_packages_from_using_this_packages_internals", "prevent_this_package_from_exposing_an_untyped_api", "prevent_this_package_from_creating_other_namespaces", "prevent_other_packages_from_using_this_package_without_explicit_visibility", "prevent_this_package_from_exposing_instance_method_public_apis", "prevent_this_package_from_exposing_undocumented_public_apis"]. See https://github.com/rubyatscale/package_protections#readme for more info'
     end
   end
 

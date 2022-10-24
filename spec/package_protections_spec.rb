@@ -40,7 +40,7 @@ describe PackageProtections do
                             'prevent_other_packages_from_using_this_packages_internalsTYPOTYPO!!' => 'something'
                           })
 
-        expect(PackageProtections.validate!).to eq(["Invalid configuration for package `.`. The metadata keys [\"some_misconfigured_key\", \"prevent_other_packages_from_using_this_packages_internalsTYPOTYPO!!\"] are not a valid behavior under the `protection` metadata namespace. Valid keys are [\"prevent_this_package_from_violating_its_stated_dependencies\", \"prevent_other_packages_from_using_this_packages_internals\", \"prevent_this_package_from_exposing_an_untyped_api\", \"prevent_this_package_from_creating_other_namespaces\", \"prevent_other_packages_from_using_this_package_without_explicit_visibility\", \"prevent_this_package_from_exposing_instance_method_public_apis\", \"prevent_this_package_from_exposing_undocumented_public_apis\"]. See https://github.com/rubyatscale/package_protections#readme for more info"])
+        expect(PackageProtections.validate!).to eq(['Invalid configuration for package `.`. The metadata keys ["some_misconfigured_key", "prevent_other_packages_from_using_this_packages_internalsTYPOTYPO!!"] are not a valid behavior under the `protection` metadata namespace. Valid keys are ["prevent_this_package_from_violating_its_stated_dependencies", "prevent_other_packages_from_using_this_packages_internals", "prevent_this_package_from_exposing_an_untyped_api", "prevent_this_package_from_creating_other_namespaces", "prevent_other_packages_from_using_this_package_without_explicit_visibility", "prevent_this_package_from_exposing_instance_method_public_apis", "prevent_this_package_from_exposing_undocumented_public_apis"]. See https://github.com/rubyatscale/package_protections#readme for more info'])
       end
 
       it 'raises on incorrect protection configuration values' do
@@ -87,7 +87,7 @@ describe PackageProtections do
         end
 
         write_package_yml('packs/trees')
-        expect(PackageProtections.validate!).to eq ["Invalid configuration for package `packs/trees`. The metadata keys [\"prevent_this_package_from_violating_its_stated_dependencies\", \"prevent_other_packages_from_using_this_packages_internals\", \"prevent_this_package_from_exposing_an_untyped_api\", \"prevent_this_package_from_creating_other_namespaces\", \"prevent_other_packages_from_using_this_package_without_explicit_visibility\", \"prevent_this_package_from_exposing_instance_method_public_apis\"] are not a valid behavior under the `protection` metadata namespace. Valid keys are []. See https://github.com/rubyatscale/package_protections#readme for more info"]
+        expect(PackageProtections.validate!).to eq ['Invalid configuration for package `packs/trees`. The metadata keys ["prevent_this_package_from_violating_its_stated_dependencies", "prevent_other_packages_from_using_this_packages_internals", "prevent_this_package_from_exposing_an_untyped_api", "prevent_this_package_from_creating_other_namespaces", "prevent_other_packages_from_using_this_package_without_explicit_visibility", "prevent_this_package_from_exposing_instance_method_public_apis"] are not a valid behavior under the `protection` metadata namespace. Valid keys are []. See https://github.com/rubyatscale/package_protections#readme for more info']
       end
     end
 
@@ -143,7 +143,7 @@ describe PackageProtections do
               enforce_dependencies: false,
               protections: { 'prevent_this_package_from_violating_its_stated_dependencies' => 'fail_on_any' })
 
-            expect(PackageProtections.validate!).to eq ["prevent_this_package_from_violating_its_stated_dependencies protection does not have the valid preconditions in packs/apples. Package packs/apples must have `enforce_dependencies: true` to use this protection. See https://github.com/rubyatscale/package_protections#readme for more info"]
+            expect(PackageProtections.validate!).to eq ['prevent_this_package_from_violating_its_stated_dependencies protection does not have the valid preconditions in packs/apples. Package packs/apples must have `enforce_dependencies: true` to use this protection. See https://github.com/rubyatscale/package_protections#readme for more info']
           end
 
           it 'fails when this package newly depends on another package implicitly from a new file' do
@@ -198,7 +198,7 @@ describe PackageProtections do
               enforce_dependencies: false,
               protections: { 'prevent_this_package_from_violating_its_stated_dependencies' => 'fail_on_any' })
 
-            expect(PackageProtections.validate!).to eq ["prevent_this_package_from_violating_its_stated_dependencies protection does not have the valid preconditions in packs/apples. Package packs/apples must have `enforce_dependencies: true` to use this protection. See https://github.com/rubyatscale/package_protections#readme for more info"]
+            expect(PackageProtections.validate!).to eq ['prevent_this_package_from_violating_its_stated_dependencies protection does not have the valid preconditions in packs/apples. Package packs/apples must have `enforce_dependencies: true` to use this protection. See https://github.com/rubyatscale/package_protections#readme for more info']
           end
 
           it 'fails when this package depends on another package implicitly' do
@@ -861,7 +861,7 @@ describe PackageProtections do
             let(:apples_visible_to) { ['packs/some_other_pack'] }
 
             it 'has a validation error' do
-              expect(PackageProtections.validate!).to eq(["prevent_other_packages_from_using_this_package_without_explicit_visibility protection does not have the valid preconditions in packs/apples. Invalid configuration for package `packs/apples`. `prevent_other_packages_from_using_this_package_without_explicit_visibility` must be turned on to use `visible_to` configuration.. See https://github.com/rubyatscale/package_protections#readme for more info"])
+              expect(PackageProtections.validate!).to eq(['prevent_other_packages_from_using_this_package_without_explicit_visibility protection does not have the valid preconditions in packs/apples. Invalid configuration for package `packs/apples`. `prevent_other_packages_from_using_this_package_without_explicit_visibility` must be turned on to use `visible_to` configuration.. See https://github.com/rubyatscale/package_protections#readme for more info'])
             end
           end
 
@@ -921,9 +921,9 @@ describe PackageProtections do
                 enforce_privacy: false,
                 protections: { 'prevent_other_packages_from_using_this_package_without_explicit_visibility' => 'fail_on_new' })
               expect(PackageProtections.validate!).to eq([
-                "prevent_other_packages_from_using_this_packages_internals protection does not have the valid preconditions in packs/apples. Package packs/apples must have `enforce_privacy: true` to use this protection. See https://github.com/rubyatscale/package_protections#readme for more info",
-                "prevent_other_packages_from_using_this_package_without_explicit_visibility protection does not have the valid preconditions in packs/apples. Package packs/apples must have `enforce_privacy: true` to use this protection. See https://github.com/rubyatscale/package_protections#readme for more info"
-              ])
+                                                           'prevent_other_packages_from_using_this_packages_internals protection does not have the valid preconditions in packs/apples. Package packs/apples must have `enforce_privacy: true` to use this protection. See https://github.com/rubyatscale/package_protections#readme for more info',
+                                                           'prevent_other_packages_from_using_this_package_without_explicit_visibility protection does not have the valid preconditions in packs/apples. Package packs/apples must have `enforce_privacy: true` to use this protection. See https://github.com/rubyatscale/package_protections#readme for more info'
+                                                         ])
             end
           end
 
@@ -1436,7 +1436,7 @@ describe PackageProtections do
           context 'package has no README.md' do
             it 'has a validation error' do
               apples_package_yml_with_api_documentation_protection_set_to_fail_on_new
-              expect(PackageProtections.validate!).to eq(["prevent_this_package_from_exposing_undocumented_public_apis protection does not have the valid preconditions in packs/apples. This package must have a readme at packs/apples/README.md to use this protection. See https://github.com/rubyatscale/package_protections#readme for more info"])
+              expect(PackageProtections.validate!).to eq(['prevent_this_package_from_exposing_undocumented_public_apis protection does not have the valid preconditions in packs/apples. This package must have a readme at packs/apples/README.md to use this protection. See https://github.com/rubyatscale/package_protections#readme for more info'])
             end
           end
 

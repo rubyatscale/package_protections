@@ -121,6 +121,7 @@ module PackageProtections
       # Validate that all protections have all preconditions met
       metadata.each do |protection_identifier, value|
         next if !valid_identifiers.include?(protection_identifier)
+
         behavior = ViolationBehavior.from_raw_value(value)
         protection = PackageProtections.with_identifier(protection_identifier)
         unmet_preconditions = protection.unmet_preconditions_for_behavior(behavior, p)

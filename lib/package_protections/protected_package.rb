@@ -13,14 +13,7 @@ module PackageProtections
     sig { params(original_package: ParsePackwerk::Package).returns(ProtectedPackage) }
     def self.from(original_package)
       metadata = original_package.metadata['protections'] || {}
-
       valid_identifiers = PackageProtections.all.map(&:identifier)
-      invalid_identifiers = metadata.keys - valid_identifiers
-
-      if invalid_identifiers.any?
-        raise IncorrectPublicApiUsageError.new("Invalid configuration for package `#{original_package.name}`. The metadata keys #{invalid_identifiers.inspect} are not valid behaviors under the `protection` metadata namespace. Valid keys are #{valid_identifiers.inspect}. See https://github.com/rubyatscale/package_protections#readme for more info") # rubocop:disable Style/RaiseArgs
-      end
-
       protections = {}
       metadata.each_key do |protection_key|
         protection = PackageProtections.with_identifier(protection_key)
@@ -32,18 +25,8 @@ module PackageProtections
       end
 
       unspecified_protections = valid_identifiers - protections.keys
-      protections_requiring_explicit_configuration = T.let([], T::Array[Identifier])
       unspecified_protections.each do |protection_key|
-        protection = PackageProtections.with_identifier(protection_key)
-        if !protection.default_behavior.fail_never?
-          protections_requiring_explicit_configuration << protection.identifier
-        end
-        protections[protection_key] = protection.default_behavior
-      end
-
-      if protections_requiring_explicit_configuration.any?
-        error = "All protections must explicitly set unless their default behavior is `fail_never`. Missing protections: #{protections_requiring_explicit_configuration.join(', ')}"
-        raise IncorrectPublicApiUsageError, error
+        protections[protection_key] = PackageProtections.with_identifier(protection_key).default_behavior
       end
 
       new(
@@ -55,13 +38,7 @@ module PackageProtections
 
     sig { params(protection: ProtectionInterface, metadata: T::Hash[T.untyped, T.untyped], package: ParsePackwerk::Package).returns(ViolationBehavior) }
     def self.get_violation_behavior(protection, metadata, package)
-      behavior = ViolationBehavior.from_raw_value(metadata[protection.identifier])
-      unmet_preconditions = protection.unmet_preconditions_for_behavior(behavior, package)
-      if !unmet_preconditions.nil?
-        raise IncorrectPublicApiUsageError.new("#{protection.identifier} protection does not have the valid preconditions. #{unmet_preconditions}. See https://github.com/rubyatscale/package_protections#readme for more info") # rubocop:disable Style/RaiseArgs
-      end
-
-      behavior
+      ViolationBehavior.from_raw_value(metadata[protection.identifier])
     end
 
     sig { params(key: Identifier).returns(ViolationBehavior) }

@@ -8,44 +8,44 @@ RSpec.describe PackageProtections::ProtectedPackage do
   end
 
   describe 'unspecified protections' do
-    it 'blows up if package has not specified behaviors explicitly for protections with non no-op default behavior' do
+    it 'has a validation error if package has not specified behaviors explicitly for protections with non no-op default behavior' do
       write_file('package.yml', <<~YML.strip)
         enforce_dependencies: false
         enforce_privacy: false
       YML
 
-      expect { PackageProtections::ProtectedPackage.from(packages.find { |p| p.name == ParsePackwerk::ROOT_PACKAGE_NAME }) }.to raise_error do |e|
-        expect(e).to be_a PackageProtections::IncorrectPublicApiUsageError
-        error_message = 'All protections must explicitly set unless their default behavior is `fail_never`. Missing protections: prevent_this_package_from_violating_its_stated_dependencies, prevent_other_packages_from_using_this_packages_internals, prevent_this_package_from_exposing_an_untyped_api, prevent_this_package_from_creating_other_namespaces'
-        expect(e.message).to include error_message
-      end
+      expect(PackageProtections.validate!).to eq([
+                                                   'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_violating_its_stated_dependencies for package ..',
+                                                   'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_other_packages_from_using_this_packages_internals for package ..',
+                                                   'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_exposing_an_untyped_api for package ..',
+                                                   'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_creating_other_namespaces for package ..'
+                                                 ])
     end
 
     context 'empty metadata->protections' do
-      it 'blows up if package has not specified behaviors explicitly for protections with non no-op default behavior in case of empty metadata->protections' do
+      it 'has a validation error if package has not specified behaviors explicitly for protections with non no-op default behavior in case of empty metadata->protections' do
         write_file('package.yml', <<~YML.strip)
           metadata:
             protections: {}
         YML
 
-        expect { PackageProtections::ProtectedPackage.from(packages.find { |p| p.name == ParsePackwerk::ROOT_PACKAGE_NAME }) }.to raise_error do |e|
-          expect(e).to be_a PackageProtections::IncorrectPublicApiUsageError
-          error_message = 'All protections must explicitly set unless their default behavior is `fail_never`. Missing protections: prevent_this_package_from_violating_its_stated_dependencies, prevent_other_packages_from_using_this_packages_internals, prevent_this_package_from_exposing_an_untyped_api, prevent_this_package_from_creating_other_namespaces'
-          expect(e.message).to include error_message
-        end
+        expect(PackageProtections.validate!).to eq([
+                                                     'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_violating_its_stated_dependencies for package ..',
+                                                     'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_other_packages_from_using_this_packages_internals for package ..',
+                                                     'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_exposing_an_untyped_api for package ..',
+                                                     'All protections must explicitly set unless their default behavior is `fail_never`. Missing protection prevent_this_package_from_creating_other_namespaces for package ..'
+                                                   ])
       end
     end
 
-    it 'blows up if metadata->protections contain unknown keys' do
+    it 'has a validation error if metadata->protections contain unknown keys' do
       write_file('package.yml', <<~YML.strip)
         metadata:
           protections:
             someprotection: true
       YML
 
-      expect {
-        PackageProtections::ProtectedPackage.from(packages.find { |p| p.name == ParsePackwerk::ROOT_PACKAGE_NAME })
-      }.to raise_exception(PackageProtections::IncorrectPublicApiUsageError)
+      expect(PackageProtections.validate!).to include 'Invalid configuration for package `.`. The metadata keys ["someprotection"] are not a valid behavior under the `protection` metadata namespace. Valid keys are ["prevent_this_package_from_violating_its_stated_dependencies", "prevent_other_packages_from_using_this_packages_internals", "prevent_this_package_from_exposing_an_untyped_api", "prevent_this_package_from_creating_other_namespaces", "prevent_other_packages_from_using_this_package_without_explicit_visibility", "prevent_this_package_from_exposing_instance_method_public_apis", "prevent_this_package_from_exposing_undocumented_public_apis"]. See https://github.com/rubyatscale/package_protections#readme for more info'
     end
   end
 

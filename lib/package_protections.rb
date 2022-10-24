@@ -91,6 +91,49 @@ module PackageProtections
     ).compact
   end
 
+  sig do
+    returns(T::Array[String])
+  end
+  def self.validate!
+    errors = T.let([], T::Array[String])
+    valid_identifiers = PackageProtections.all.map(&:identifier)
+
+    ParsePackwerk.all.each do |p|
+      metadata = p.metadata['protections'] || {}
+
+      # Validate that there are no invalid keys
+      invalid_identifiers = metadata.keys - valid_identifiers
+      if invalid_identifiers.any?
+        errors << "Invalid configuration for package `#{p.name}`. The metadata keys #{invalid_identifiers.inspect} are not a valid behavior under the `protection` metadata namespace. Valid keys are #{valid_identifiers.inspect}. See https://github.com/rubyatscale/package_protections#readme for more info"
+      end
+
+      # Validate that all protections requiring configuration have explicit configuration
+      unspecified_protections = valid_identifiers - metadata.keys
+      protections_requiring_explicit_configuration = unspecified_protections.reject do |protection_key|
+        protection = PackageProtections.with_identifier(protection_key)
+        protection.default_behavior.fail_never?
+      end
+
+      protections_requiring_explicit_configuration.each do |protection_identifier|
+        errors << "All protections must explicitly set unless their default behavior is `fail_never`. Missing protection #{protection_identifier} for package #{p.name}."
+      end
+
+      # Validate that all protections have all preconditions met
+      metadata.each do |protection_identifier, value|
+        next if !valid_identifiers.include?(protection_identifier)
+
+        behavior = ViolationBehavior.from_raw_value(value)
+        protection = PackageProtections.with_identifier(protection_identifier)
+        unmet_preconditions = protection.unmet_preconditions_for_behavior(behavior, p)
+        if unmet_preconditions
+          errors << "#{protection_identifier} protection does not have the valid preconditions in #{p.name}. #{unmet_preconditions}. See https://github.com/rubyatscale/package_protections#readme for more info"
+        end
+      end
+    end
+
+    errors
+  end
+
   #
   # PackageProtections.set_defaults! sets any unset protections to their default enforcement
   #

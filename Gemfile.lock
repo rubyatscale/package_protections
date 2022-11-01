@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    package_protections (3.1.0)
+    package_protections (3.2.0)
       activesupport
       parse_packwerk
       rubocop
@@ -68,7 +68,7 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.21.0)
       parser (>= 3.1.1.0)
-    rubocop-packs (0.0.14)
+    rubocop-packs (0.0.15)
       activesupport
       parse_packwerk
       rubocop

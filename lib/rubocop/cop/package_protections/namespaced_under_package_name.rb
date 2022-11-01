@@ -10,36 +10,6 @@ module RuboCop
         extend T::Sig
         include ::PackageProtections::RubocopProtectionInterface
 
-        # We override `cop_configs` for this protection.
-        # The default behavior disables cops when a package has turned off a protection.
-        # However: namespace violations can occur even when one package has TURNED OFF their namespace protection
-        # but another package has it turned on. Therefore, all packages must always be opted in no matter what.
-        #
-        sig do
-          params(packages: T::Array[::PackageProtections::ProtectedPackage])
-          .returns(T::Array[::PackageProtections::RubocopProtectionInterface::CopConfig])
-        end
-        def cop_configs(packages)
-          include_packs = T.let([], T::Array[String])
-          packages.each do |p|
-            enabled_for_pack = !p.violation_behavior_for(NamespacedUnderPackageName::IDENTIFIER).fail_never?
-            if enabled_for_pack
-              include_packs << p.name
-            end
-          end
-
-          [
-            ::PackageProtections::RubocopProtectionInterface::CopConfig.new(
-              name: cop_name,
-              enabled: include_packs.any?,
-              metadata: {
-                'IncludePacks' => include_packs,
-                'GloballyPermittedNamespaces' => ::RuboCop::Packs.config.globally_permitted_namespaces
-              }
-            )
-          ]
-        end
-
         sig { override.returns(T::Array[String]) }
         def included_globs_for_pack
           [

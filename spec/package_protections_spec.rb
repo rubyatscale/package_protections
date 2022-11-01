@@ -650,7 +650,7 @@ describe PackageProtections do
           it 'generates the expected rubocop.yml entries' do
             apples_package_yml_with_namespace_protection_set_to_fail_never
             cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
-            expect(cop_config).to eq({ 'Enabled' => false, 'GloballyPermittedNamespaces' => [], 'IncludePacks' => [] })
+            expect(cop_config).to eq({ 'Enabled' => false })
           end
 
           it 'is implemented by Rubocop' do
@@ -689,9 +689,7 @@ describe PackageProtections do
               apples_package_yml_with_namespace_protection_set_to_fail_on_new
               cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
               expect(cop_config['Exclude']).to eq(nil)
-              expect(cop_config['Include']).to eq(nil)
-              expect(cop_config['IncludePacks']).to eq(['packs/apples'])
-              expect(cop_config['GloballyPermittedNamespaces']).to eq([])
+              expect(cop_config['Include']).to eq(["packs/apples/app/**/*", "packs/apples/lib/**/*"])
             end
           end
 
@@ -702,10 +700,8 @@ describe PackageProtections do
               apples_package_yml_with_namespace_protection_set_to_fail_on_new
               cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
               expect(cop_config['Exclude']).to eq(nil)
-              expect(cop_config['Include']).to eq(nil)
-              expect(cop_config['IncludePacks']).to eq(['packs/apples'])
+              expect(cop_config['Include']).to eq(["packs/apples/app/**/*", "packs/apples/lib/**/*"])
               expect(cop_config['Enabled']).to eq(true)
-              expect(cop_config['GloballyPermittedNamespaces']).to eq(%w[AppleTrees Ciders Apples])
             end
           end
 
@@ -728,9 +724,7 @@ describe PackageProtections do
                 cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
                 expect(cop_config['Exclude']).to eq(nil)
                 expect(cop_config['Enabled']).to eq(true)
-                expect(cop_config['Include']).to eq(nil)
-                expect(cop_config['IncludePacks']).to eq(['packs/apples/subpack'])
-                expect(cop_config['GloballyPermittedNamespaces']).to eq([])
+                expect(cop_config['Include']).to eq(["packs/apples/subpack/app/**/*", "packs/apples/subpack/lib/**/*"])
               end
             end
 
@@ -742,9 +736,7 @@ describe PackageProtections do
                 cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
                 expect(cop_config['Exclude']).to eq(nil)
                 expect(cop_config['Enabled']).to eq(true)
-                expect(cop_config['Include']).to eq(nil)
-                expect(cop_config['IncludePacks']).to eq(['packs/apples/subpack'])
-                expect(cop_config['GloballyPermittedNamespaces']).to eq(%w[AppleTrees Ciders Apples])
+                expect(cop_config['Include']).to eq(["packs/apples/subpack/app/**/*", "packs/apples/subpack/lib/**/*"])
               end
             end
 

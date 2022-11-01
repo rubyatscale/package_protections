@@ -56,7 +56,7 @@ This protection only looks at files in `packs/your_pack/app` (it ignores spec fi
 This protection is implemented via Rubocop -- expect to see results for this when running `rubocop` however you normally do. To add to the TODO list, add to `.rubocop_todo.yml`
 Lastly – this protection can be configured by setting `globally_permitted_namespaces`, e.g.:
 ```ruby
-PackageProtections.configure do |config|
+RuboCop::Packs.configure do |config|
   config.globally_permitted_namespaces = ['SomeGlobalNamespace']
 end
 ```

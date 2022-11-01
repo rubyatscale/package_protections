@@ -12,7 +12,7 @@ describe PackageProtections do
     PackageProtections.bust_cache!
     allow(Bundler).to receive(:root).and_return(Pathname.new('.'))
 
-    PackageProtections.configure do |config|
+    RuboCop::Packs.configure do |config|
       config.globally_permitted_namespaces = globally_permitted_namespaces
     end
   end
@@ -1615,7 +1615,7 @@ describe PackageProtections do
       let(:globally_permitted_namespaces) { ['MyNamespace'] }
 
       it 'properly configures package protections' do
-        expect(PackageProtections.config.globally_permitted_namespaces).to eq(['MyNamespace'])
+        expect(RuboCop::Packs.config.globally_permitted_namespaces).to eq(['MyNamespace'])
       end
     end
   end

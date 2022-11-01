@@ -6,6 +6,7 @@
 
 module RuboCop; end
 module RuboCop::Cop; end
+
 module RuboCop::Cop::Packs; end
 
 class RuboCop::Cop::Packs::ClassMethodsAsPublicApis < ::RuboCop::Cop::Base
@@ -29,9 +30,6 @@ class RuboCop::Cop::Packs::NamespaceConvention < ::RuboCop::Cop::Base
 
   sig { returns(RuboCop::Cop::Packs::NamespaceConvention::DesiredZeitwerkApi) }
   def desired_zeitwerk_api; end
-
-  sig { returns(T::Hash[String, String]) }
-  def namespaces_to_packs; end
 end
 
 class RuboCop::Cop::Packs::NamespaceConvention::DesiredZeitwerkApi
@@ -72,7 +70,27 @@ class RuboCop::Cop::Packs::RequireDocumentedPublicApis < ::RuboCop::Cop::Style::
   def support_autocorrect?; end
 end
 
-class RuboCop::Cop::Packs::TypedPublicApi < ::RuboCop::Cop::Sorbet::StrictSigil; end
+class RuboCop::Cop::Packs::TypedPublicApi < ::RuboCop::Cop::Sorbet::StrictSigil
+  sig { params(processed_source: T.untyped).void }
+  def investigate(processed_source); end
+end
+
+module RuboCop::Cop::PackwerkLite; end
+class RuboCop::Cop::PackwerkLite::ConstantResolver; end
+
+class RuboCop::Cop::PackwerkLite::ConstantResolver::ConstantReference < ::T::Struct
+  const :constant_definition_location, Pathname
+  const :constant_name, String
+  const :global_namespace, String
+  const :referencing_file, Pathname
+  const :source_package, ParsePackwerk::Package
+
+  sig { returns(T::Boolean) }
+  def public_api?; end
+
+  sig { returns(ParsePackwerk::Package) }
+  def referencing_package; end
+end
 
 module RuboCop::Packs
   class << self
@@ -117,11 +135,23 @@ module RuboCop::Packs::Private
     sig { void }
     def bust_cache!; end
 
+    sig { params(rule: String).returns(T::Set[String]) }
+    def exclude_for_rule(rule); end
+
     sig { void }
     def load_client_configuration; end
 
     sig { returns(T::Array[T::Hash[T.untyped, T.untyped]]) }
     def rubocop_todo_ymls; end
+
+    sig { params(package: ParsePackwerk::Package).returns(T::Array[String]) }
+    def validate_failure_mode_strict(package); end
+
+    sig { params(package: ParsePackwerk::Package).returns(T::Array[String]) }
+    def validate_rubocop_todo_yml(package); end
+
+    sig { params(package: ParsePackwerk::Package).returns(T::Array[String]) }
+    def validate_rubocop_yml(package); end
   end
 end
 
@@ -133,7 +163,21 @@ class RuboCop::Packs::Private::Configuration
   def bust_cache!; end
 
   sig { returns(T::Array[String]) }
+  def globally_permitted_namespaces; end
+
+  def globally_permitted_namespaces=(_arg0); end
+
+  sig { returns(T::Array[String]) }
   def permitted_pack_level_cops; end
 
   def permitted_pack_level_cops=(_arg0); end
+
+  sig { returns(T::Array[String]) }
+  def required_pack_level_cops; end
+
+  def required_pack_level_cops=(_arg0); end
 end
+
+module RuboCop::PackwerkLite; end
+class RuboCop::PackwerkLite::Error < ::StandardError; end
+

@@ -34,7 +34,7 @@ module RuboCop
               enabled: include_packs.any?,
               metadata: {
                 'IncludePacks' => include_packs,
-                'GloballyPermittedNamespaces' => ::PackageProtections.config.globally_permitted_namespaces
+                'GloballyPermittedNamespaces' => ::RuboCop::Packs.config.globally_permitted_namespaces
               }
             )
           ]

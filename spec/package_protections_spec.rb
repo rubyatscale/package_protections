@@ -689,7 +689,7 @@ describe PackageProtections do
               apples_package_yml_with_namespace_protection_set_to_fail_on_new
               cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
               expect(cop_config['Exclude']).to eq(nil)
-              expect(cop_config['Include']).to eq(["packs/apples/app/**/*", "packs/apples/lib/**/*"])
+              expect(cop_config['Include']).to eq(['packs/apples/app/**/*', 'packs/apples/lib/**/*'])
             end
           end
 
@@ -700,7 +700,7 @@ describe PackageProtections do
               apples_package_yml_with_namespace_protection_set_to_fail_on_new
               cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
               expect(cop_config['Exclude']).to eq(nil)
-              expect(cop_config['Include']).to eq(["packs/apples/app/**/*", "packs/apples/lib/**/*"])
+              expect(cop_config['Include']).to eq(['packs/apples/app/**/*', 'packs/apples/lib/**/*'])
               expect(cop_config['Enabled']).to eq(true)
             end
           end
@@ -724,7 +724,7 @@ describe PackageProtections do
                 cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
                 expect(cop_config['Exclude']).to eq(nil)
                 expect(cop_config['Enabled']).to eq(true)
-                expect(cop_config['Include']).to eq(["packs/apples/subpack/app/**/*", "packs/apples/subpack/lib/**/*"])
+                expect(cop_config['Include']).to eq(['packs/apples/subpack/app/**/*', 'packs/apples/subpack/lib/**/*'])
               end
             end
 
@@ -736,7 +736,7 @@ describe PackageProtections do
                 cop_config = get_resulting_rubocop['PackageProtections/NamespacedUnderPackageName']
                 expect(cop_config['Exclude']).to eq(nil)
                 expect(cop_config['Enabled']).to eq(true)
-                expect(cop_config['Include']).to eq(["packs/apples/subpack/app/**/*", "packs/apples/subpack/lib/**/*"])
+                expect(cop_config['Include']).to eq(['packs/apples/subpack/app/**/*', 'packs/apples/subpack/lib/**/*'])
               end
             end
 

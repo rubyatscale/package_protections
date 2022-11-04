@@ -34,7 +34,6 @@ module PackageProtections
           Private::IncomingPrivacyProtection.new,
           RuboCop::Cop::PackageProtections::TypedPublicApi.new,
           RuboCop::Cop::PackageProtections::NamespacedUnderPackageName.new,
-          Private::VisibilityProtection.new,
           RuboCop::Cop::PackageProtections::OnlyClassMethods.new,
           RuboCop::Cop::PackageProtections::RequireDocumentedPublicApis.new
         ]

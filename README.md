@@ -10,7 +10,6 @@ This gem ships with the following checks
 2) Other packages are not using the private API of your package (via `packwerk` `enforce_privacy`)
 3) Your package has a typed public API (via the `rubocop` `PackageProtections/TypedPublicApi` cop)
 4) Your package only creates a single namespace (via the `rubocop` `PackageProtections/NamespacedUnderPackageName` cop)
-4) Your package is only visible to a select number of packages (via the `packwerk` `enforce_privacy` cop)
 
 ## Initial Configuration
 Package protections first requires that your application is using [`packwerk`](https://github.com/Shopify/packwerk), [`rubocop`](https://github.com/rubocop/rubocop), and [`rubocop-sorbet`](https://github.com/Shopify/rubocop-sorbet). Follow the regular setup instructions for those tools before proceeding.
@@ -62,25 +61,6 @@ end
 ```
 
 If you've worked through all of the TODOs for this cop and are able to set the value to `fail_on_any`, you can also set `automatic_pack_namespace` which will support your pack having one global namespace without extra subdirectories. That is, instead of `packs/foo/app/services/foo/bar.rb`, you can use `packs/foo/app/services/bar.rb` and still have it define `Foo::Bar`. [See the `stimpack` README.md](https://github.com/rubyatscale/stimpack#readme) for more information.
-
-### `prevent_other_packages_from_using_this_package_without_explicit_visibility`
-*This is only available if your package has `enforce_privacy` set to `true`!*
-This protection exists to help packages have control over who their clients are. When turning on this protection, only clients who are listed in your `visible_to` metadata will be allowed to consume your package. Here is an example in `packs/apples/package.yml`:
-```yml
-enforce_privacy: true
-enforce_dependencies: true
-metadata:
-  protections:
-    prevent_other_packages_from_using_this_package_without_explicit_visibility: fail_on_new
-    # ... other protections are the same
-  visible_to:
-    - packs/other_pack
-    - packs/another_pack
-```
-In this package, only `packs/other_pack` and `packs/another_pack` can use `packs/apples`. With both the `fail_on_new` and `fail_on_any` setting, only those packs can state a dependency on `packs/apples` in their `package.yml`. If any other packs state a dependency on `packs/apples`, the build will fail, even with violations. With the `fail_on_new` setting, a pack can create a dependency or privacy violation on `packs/apples` even if it's not listed. With `fail_on_any`, no violations are allowed.
-If `visible_to` is not set and the protection is turned on, then the package cannot be consumed by any package (a top-level package might be a good candidate for this).
-
-Note that this protection's default behavior is `fail_never`, so it can remain unset in the `package.yml`.
 
 ## Violation Behaviors
 #### `fail_on_any`

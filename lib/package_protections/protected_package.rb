@@ -66,11 +66,6 @@ module PackageProtections
       original_package.dependencies
     end
 
-    sig { returns(T::Set[String]) }
-    def visible_to
-      Set.new(metadata['visible_to'] || [])
-    end
-
     sig { returns(T::Array[ParsePackwerk::Violation]) }
     def violations
       deprecated_references.violations
